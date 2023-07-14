@@ -133,6 +133,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\App\Application.cpp" />
+    <ClCompile Include="src\Game\Satellite.cpp" />
     <ClCompile Include="src\Game\Ship.cpp" />
     <ClCompile Include="src\Graphics\Font.cpp" />
     <ClCompile Include="src\Graphics\Graphics.cpp" />
@@ -147,6 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App\Application.h" />
+    <ClInclude Include="src\Game\Satellite.h" />
     <ClInclude Include="src\Game\Ship.h" />
     <ClInclude Include="src\Graphics\Font.h" />
     <ClInclude Include="src\Graphics\Graphics.h" />

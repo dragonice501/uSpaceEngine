@@ -19,20 +19,20 @@ void Application::Setup()
 {
     running = Graphics::OpenWindow();
 
-    moon = new Body(CircleShape(150), Graphics::ScreenWidth() * 0.5f, Graphics::ScreenHeight() * 0.5f, 150.0f);
-    moon->resolvePentration = false;
-    CircleShape* moonShape = static_cast<CircleShape*>(moon->shape);
+    tulli = new Satellite(Graphics::ScreenWidth() * 0.5f, Graphics::ScreenHeight() * 0.5f, 150.0f, 150.0f, 100.0f);
+    tulli->GetBody()->resolvePentration = false;
+    CircleShape* tulliShape = static_cast<CircleShape*>(tulli->GetBody()->shape);
 
-    ship = new Body(CircleShape(5), 0, 0, 1.0);
-    CircleShape* shape = static_cast<CircleShape*>(ship->shape);
-    ship->position = Vec2(moon->position.x, moon->position.y - moonShape->radius - shape->radius);
-    ship->restitution = 0.5f;
+    ship = new Ship(0.0f, 0.0f, 5.0f, 1.0f);
+    CircleShape* shape = static_cast<CircleShape*>(ship->GetBody()->shape);
+    ship->GetBody()->position = Vec2(tulli->GetBody()->position.x, tulli->GetBody()->position.y - tulliShape->radius - shape->radius);
+    ship->GetBody()->restitution = 0.5f;
 }
 
 void Application::Destroy()
 {
     delete ship;
-    delete moon;
+    delete tulli;
 
     Graphics::CloseWindow();
 }
@@ -68,47 +68,47 @@ void Application::Input() {
 
                 if (event.key.keysym.sym == SDLK_1)
                 {
-                    throttle = 0.1f;
+                    ship->SetThrottle(0.1f);
                     break;
                 }
                 if (event.key.keysym.sym == SDLK_2)
                 {
-                    throttle = 0.2f;
+                    ship->SetThrottle(0.2f);
                     break;
                 }
                 if (event.key.keysym.sym == SDLK_3)
                 {
-                    throttle = 0.3f;
+                    ship->SetThrottle(0.3f);
                     break;
                 }
                 if (event.key.keysym.sym == SDLK_4)
                 {
-                    throttle = 0.4f;
+                    ship->SetThrottle(0.4f);
                     break;
                 }
                 if (event.key.keysym.sym == SDLK_5)
                 {
-                    throttle = 0.5f;
+                    ship->SetThrottle(0.5f);
                     break;
                 }
                 if (event.key.keysym.sym == SDLK_6)
                 {
-                    throttle = 0.6f;
+                    ship->SetThrottle(0.6f);
                     break;
                 }
                 if (event.key.keysym.sym == SDLK_7)
                 {
-                    throttle = 0.7f;
+                    ship->SetThrottle(0.7f);
                     break;
                 }
                 if (event.key.keysym.sym == SDLK_8)
                 {
-                    throttle = 0.8f;
+                    ship->SetThrottle(0.8f);
                     break;
                 }
                 if (event.key.keysym.sym == SDLK_9)
                 {
-                    throttle = 0.9f;
+                    ship->SetThrottle(0.9f);
                     break;
                 }
 
@@ -136,33 +136,33 @@ void Application::Input() {
 
                 if (event.key.keysym.sym == SDLK_w)
                 {
-                    throttleForwardPressed = true;
+                    ship->ThrottleForwardPressed(true);
                     break;
                 }
                 if (event.key.keysym.sym == SDLK_s)
                 {
-                    throttleBackPressed = true;
+                    ship->ThrottleBackPressed(true);
                     break;
                 }
                 if (event.key.keysym.sym == SDLK_a)
                 {
-                    turnLeftPressed = true;
+                    ship->TurnLeftPressed(true);
                     break;
                 }
                 if (event.key.keysym.sym == SDLK_d)
                 {
-                    turnRightPressed = true;
+                    ship->TurnRightPressed(true);
                     break;
                 }
 
                 if (event.key.keysym.sym == SDLK_z)
                 {
-                    throttle = throttleMax;
+                    ship->SetThrottle(1.0f);
                     break;
                 }
                 else if (event.key.keysym.sym == SDLK_x)
                 {
-                    throttle = 0.0f;
+                    ship->SetThrottle(0.0f);
                     break;
                 }
 
@@ -171,13 +171,13 @@ void Application::Input() {
             case SDL_KEYUP:
             {
                 if (event.key.keysym.sym == SDLK_w)
-                    throttleForwardPressed = false;
+                    ship->ThrottleForwardPressed(false);
                 if (event.key.keysym.sym == SDLK_s)
-                    throttleBackPressed = false;
+                    ship->ThrottleBackPressed(false);
                 if (event.key.keysym.sym == SDLK_a)
-                    turnLeftPressed = false;
+                    ship->TurnLeftPressed(false);
                 if (event.key.keysym.sym == SDLK_d)
-                    turnRightPressed = false;
+                    ship->TurnRightPressed(false);
                 break;
             }
             case SDL_MOUSEMOTION:
@@ -226,50 +226,56 @@ void Application::Update()
 
     timePreviousFrame = SDL_GetTicks();
 
-    UpdateShip(deltaTime);
+    ship->Update(deltaTime, tulli);
+
+    Contact contact;
+    if (CollisionDetection::IsColliding(ship->GetBody(), tulli->GetBody(), contact))
+    {
+        contact.ResolveCollision();
+    }
 }
 
 void Application::Render()
 {
-    if(moon->shape->GetType() == CIRCLE)
+    if(tulli->GetBody()->shape->GetType() == CIRCLE)
     {
-        CircleShape* circle = static_cast<CircleShape*>(moon->shape);
-        Graphics::DrawFillCircle(moon->position.x, moon->position.y, circle->radius, 0xFFFFFFAA);
+        CircleShape* circle = static_cast<CircleShape*>(tulli->GetBody()->shape);
+        Graphics::DrawFillCircle(tulli->GetBody()->position.x, tulli->GetBody()->position.y, circle->radius, 0xFFFFFFAA);
     }
 
     if (ship)
     {
-        if (showVectors && ship->shape->GetType() == CIRCLE)
+        if (showVectors && ship->GetBody()->shape->GetType() == CIRCLE)
         {
-            CircleShape* circle = static_cast<CircleShape*>(ship->shape);
-            Vec2 velocityVector = ship->velocity;
+            CircleShape* circle = static_cast<CircleShape*>(ship->GetBody()->shape);
+            Vec2 velocityVector = ship->GetBody()->velocity;
             velocityVector.Normalize();
 
             Graphics::DrawLine(
-                ship->position.x,
-                ship->position.y,
-                ship->position.x + velocityVector.x * circle->radius * 3.0f,
-                ship->position.y + velocityVector.y * circle->radius * 3.0f,
+                ship->GetBody()->position.x,
+                ship->GetBody()->position.y,
+                ship->GetBody()->position.x + velocityVector.x * circle->radius * 3.0f,
+                ship->GetBody()->position.y + velocityVector.y * circle->radius * 3.0f,
                 0xFFFFFF00, false);
 
             Graphics::DrawLine(
-                ship->position.x,
-                ship->position.y,
-                ship->position.x + thrustVector.x * circle->radius * 3.0f,
-                ship->position.y + thrustVector.y * circle->radius * 3.0f,
+                ship->GetBody()->position.x,
+                ship->GetBody()->position.y,
+                ship->GetBody()->position.x + ship->GetThrustVector().x * circle->radius * 3.0f,
+                ship->GetBody()->position.y + ship->GetThrustVector().y * circle->radius * 3.0f,
                 0xFFFF0000, false);
         }
 
-        if (ship->shape->GetType() == CIRCLE)
+        if (ship->GetBody()->shape->GetType() == CIRCLE)
         {
-            CircleShape* circle = static_cast<CircleShape*>(ship->shape);
-            Graphics::DrawFillCircle(ship->position.x, ship->position.y, circle->radius, 0xFFFFAA00);
+            CircleShape* circle = static_cast<CircleShape*>(ship->GetBody()->shape);
+            Graphics::DrawFillCircle(ship->GetBody()->position.x, ship->GetBody()->position.y, circle->radius, 0xFFFFAA00);
         }
 
         if (showTrajectory)
         {
-            Body dummyParticle(*ship);
-            Body dummyMoon(*moon);
+            Body dummyParticle(*ship->GetBody());
+            Body dummyMoon(*tulli->GetBody());
 
             Vec2 attraction;
             Vec2 acceleration;
@@ -300,8 +306,8 @@ void Application::Render()
         RenderUI();
 
     Graphics::DrawString(
-        moon->position.x - Font::GetStringFontLength("tulli") * 0.5f,
-        moon->position.y - Font::fontHeight * 0.5f,
+        tulli->GetBody()->position.x - Font::GetStringFontLength("tulli") * 0.5f,
+        tulli->GetBody()->position.y - Font::fontHeight * 0.5f,
         "tulli",
         0xFF000000, false);
 
@@ -312,62 +318,20 @@ void Application::Render()
 
 void Application::Reset()
 {
-    CircleShape* shape = static_cast<CircleShape*>(ship->shape);
-    CircleShape* moonShape = static_cast<CircleShape*>(moon->shape);
+    CircleShape* shape = static_cast<CircleShape*>(ship->GetBody()->shape);
+    CircleShape* moonShape = static_cast<CircleShape*>(tulli->GetBody()->shape);
 
-    ship->position = Vec2(moon->position.x, moon->position.y - moonShape->radius - shape->radius);
-    ship->velocity = Vec2(0.0f, 0.0f);
-    ship->rotation = -M_PI * 0.5f;
+    ship->GetBody()->position = Vec2(tulli->GetBody()->position.x, tulli->GetBody()->position.y - moonShape->radius - shape->radius);
+    ship->GetBody()->velocity = Vec2(0.0f, 0.0f);
+    ship->GetBody()->rotation = -M_PI * 0.5f;
 
-    thrustVector = Vec2(0.0f, -1.0f);
-    fuel = 1.0f;
+    ship->SetThrottle(0.0f);
+    ship->SetThrustVector(Vec2(0.0f, -1.0f));
+    ship->SetFuel(1.0f);
 
     timeAccelIndex = 1;
 
     Graphics::ResetScreenOffset();
-}
-
-void Application::UpdateShip(float dt)
-{
-    if (throttleForwardPressed)
-    {
-        throttle += throttleRate * deltaTime;
-
-        if (throttle > throttleMax) throttle = throttleMax;
-    }
-    else if (throttleBackPressed)
-    {
-        throttle -= throttleRate * deltaTime;
-
-        if (throttle < 0.0f) throttle = 0.0f;
-    }
-
-    if (turnRightPressed)
-    {
-        thrustVector = thrustVector.Rotate(M_PI * turnSpeed * deltaTime);
-    }
-    if (turnLeftPressed)
-    {
-        thrustVector = thrustVector.Rotate(-M_PI * turnSpeed * deltaTime);
-    }
-
-    Vec2 attraction = Force::GenerateGravitationalForce(*ship, *moon, G, 0, 100);
-    ship->AddForce(attraction);
-
-    if (throttle != 0.0f && fuel != 0.0f)
-    {
-        ship->AddForce(thrustVector * thrust * throttle);
-        fuel -= fuelMaxBurnRate * throttle * deltaTime;
-        if (fuel < 0.0f) fuel = 0.0f;
-    }
-
-    ship->Update(deltaTime);
-
-    Contact contact;
-    if (CollisionDetection::IsColliding(ship, moon, contact))
-    {
-        contact.ResolveCollision();
-    }
 }
 
 void Application::RenderTutorialText()
@@ -438,12 +402,12 @@ void Application::RenderUI()
     const char* altitudeString = "altitude: ";
     Graphics::DrawString(10, Graphics::ScreenHeight() - 110, altitudeString, 0xFFADD8E6, true);
 
-    CircleShape* moonShape = static_cast<CircleShape*>(moon->shape);
-    CircleShape* shipShape = static_cast<CircleShape*>(ship->shape);
+    CircleShape* moonShape = static_cast<CircleShape*>(tulli->GetBody()->shape);
+    CircleShape* shipShape = static_cast<CircleShape*>(ship->GetBody()->shape);
     Graphics::DrawString(
         10 + Font::GetStringFontLength(altitudeString),
         Graphics::ScreenHeight() - 110,
-        std::to_string((ship->position - moon->position).Magnitude() - moonShape->radius - shipShape->radius).c_str(),
+        std::to_string((ship->GetBody()->position - tulli->GetBody()->position).Magnitude() - moonShape->radius - shipShape->radius).c_str(),
         0xFFADD8E6, true);
 
     const char* velocityString = "velocity: ";
@@ -451,10 +415,10 @@ void Application::RenderUI()
     Graphics::DrawString(
         10 + Font::GetStringFontLength(velocityString),
         Graphics::ScreenHeight() - 100,
-        std::to_string(ship->velocity.Magnitude()).c_str(),
+        std::to_string(ship->GetBody()->velocity.Magnitude()).c_str(),
         0xFFADD8E6, true);
 
-    float foeDot = (thrustVector.UnitVector().Dot((ship->position - moon->position).UnitVector())) * 90.0f;
+    float foeDot = (ship->GetThrustVector().UnitVector().Dot((ship->GetBody()->position - tulli->GetBody()->position).UnitVector())) * 90.0f;
     const char* foeString = "foe: ";
     Graphics::DrawString(10, Graphics::ScreenHeight() - 90, foeString, 0xFFADD8E6, true);
     Graphics::DrawString(
@@ -468,17 +432,17 @@ void Application::RenderUI()
     Graphics::DrawString(
         10 + Font::GetStringFontLength(fuelString),
         Graphics::ScreenHeight() - 70,
-        std::to_string(fuel * 100.0f).c_str(),
+        std::to_string(ship->GetFuel() * 100.0f).c_str(),
         0xFFADD8E6, true);
     Graphics::DrawFillRect(10, Graphics::ScreenHeight() - 62, 104, 14, 0xFFFFFFFF);
     Graphics::DrawFillRect(12, Graphics::ScreenHeight() - 60, 100, 10, 0xFF000055);
-    Graphics::DrawFillRect(12, Graphics::ScreenHeight() - 60, fuel * 100, 10, 0xFF00AAAA);
+    Graphics::DrawFillRect(12, Graphics::ScreenHeight() - 60, ship->GetFuel() * 100, 10, 0xFF00AAAA);
 
     Graphics::DrawString(10, Graphics::ScreenHeight() - 40, "throttle", 0xFFADD8E6, true);
 
     Graphics::DrawFillRect(10, Graphics::ScreenHeight() - 32, 104, 24, 0xFFFFFFFF);
     Graphics::DrawFillRect(12, Graphics::ScreenHeight() - 30, 100, 20, 0xFF005500);
-    Graphics::DrawFillRect(12, Graphics::ScreenHeight() - 30, throttle * 100, 20, 0xFF00AA00);
+    Graphics::DrawFillRect(12, Graphics::ScreenHeight() - 30, ship->GetThrottle() * 100, 20, 0xFF00AA00);
 
     Graphics::DrawLine(45, Graphics::ScreenHeight() - 10, 45, Graphics::ScreenHeight() - 25, 0xFFFFFFFF, true);
     Graphics::DrawLine(78, Graphics::ScreenHeight() - 10, 78, Graphics::ScreenHeight() - 25, 0xFFFFFFFF, true);

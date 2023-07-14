@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Phsyics/Body.h"
+#include "Satellite.h"
 
 class Ship
 {
@@ -9,11 +10,31 @@ public:
 	Ship(const float& x, const float& y, const int& radius, const float& mass);
 	~Ship();
 
-    void Update(float dt);
+    inline Body* GetBody() { return body; }
+
+    inline const float& GetThrottle() const { return throttle; }
+    inline const Vec2& GetThrustVector() const { return thrustVector; }
+    inline const float& GetFuel() const { return fuel; }
+
+    inline void SetThrottle(const float& newThrottle) { throttle = newThrottle; }
+    inline void SetThrustVector(const Vec2& vector) { thrustVector = vector; }
+    inline void SetFuel(const float& newFuel) { fuel = newFuel; }
+
+    inline void ThrottleForwardPressed(const bool& pressed) { throttleForwardPressed = pressed; }
+    inline void ThrottleBackPressed(const bool& pressed) { throttleBackPressed = pressed; }
+    inline void TurnRightPressed(const bool& pressed) { turnRightPressed = pressed; }
+    inline void TurnLeftPressed(const bool& pressed) { turnLeftPressed = pressed; }
+
+    void Update(float dt, const Satellite* satellite);
     void Render();
 
 private:
 	Body* body;
+
+    bool throttleForwardPressed = false;
+    bool throttleBackPressed = false;
+    bool turnRightPressed = false;
+    bool turnLeftPressed = false;
 
     float throttle = 0.0f;
     float throttleMax = 1.0f;
