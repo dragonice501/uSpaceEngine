@@ -19,9 +19,17 @@ void Application::Setup()
 {
     running = Graphics::OpenWindow();
 
-    tulli = new Satellite(Graphics::ScreenWidth() * 0.5f, Graphics::ScreenHeight() * 0.5f, 150.0f, 150.0f, 100.0f);
+    tulli = new Satellite(Graphics::ScreenWidth() * 0.5f, Graphics::ScreenHeight() * 0.5f, 150.0f, 150.0f, 400.0f);
+    tulli->SetColor(0xFFFFFFAA);
     tulli->GetBody()->resolvePentration = false;
     CircleShape* tulliShape = static_cast<CircleShape*>(tulli->GetBody()->shape);
+    satellites.push_back(tulli);
+
+    yobo = new Satellite(Graphics::ScreenWidth() - 100, Graphics::ScreenHeight() * 0.5f, 30.0f, 30.0f, 100.0f);
+    yobo->SetColor(0xFFAAFFAA);
+    yobo->GetBody()->resolvePentration = false;
+    yobo->GetBody()->velocity = { 0.0f, -16.9f };
+    satellites.push_back(yobo);
 
     ship = new Ship(0.0f, 0.0f, 5.0f, 1.0f);
     CircleShape* shape = static_cast<CircleShape*>(ship->GetBody()->shape);
@@ -33,6 +41,7 @@ void Application::Destroy()
 {
     delete ship;
     delete tulli;
+    delete yobo;
 
     Graphics::CloseWindow();
 }
@@ -226,90 +235,51 @@ void Application::Update()
 
     timePreviousFrame = SDL_GetTicks();
 
-    ship->Update(deltaTime, tulli);
-
-    Contact contact;
-    if (CollisionDetection::IsColliding(ship->GetBody(), tulli->GetBody(), contact))
+    for (Satellite* satellite : satellites)
     {
-        contact.ResolveCollision();
+        if ((ship->GetBody()->position - satellite->GetBody()->position).MagnitudeSquared() < satellite->GetSOI() * satellite->GetSOI())
+        {
+            influencingSatellites.push_back(satellite);
+        }
     }
+
+    float nearestDistance = std::numeric_limits<float>::max();
+    nearestSatellite = nullptr;
+    for (Satellite* satellite : satellites)
+    {
+        float distance = (ship->GetBody()->position - satellite->GetBody()->position).MagnitudeSquared();
+        if (distance < nearestDistance)
+        {
+            nearestDistance = distance;
+            nearestSatellite = satellite;
+        }
+    }
+
+    ship->Update(deltaTime, nearestSatellite);
+    yobo->Update(deltaTime, tulli);
+
+    if (nearestSatellite)
+    {
+        Contact contact;
+        if (CollisionDetection::IsColliding(ship->GetBody(), nearestSatellite->GetBody(), contact))
+        {
+            contact.ResolveCollision();
+        }
+    }
+
+    influencingSatellites.clear();
 }
 
 void Application::Render()
 {
-    if(tulli->GetBody()->shape->GetType() == CIRCLE)
-    {
-        CircleShape* circle = static_cast<CircleShape*>(tulli->GetBody()->shape);
-        Graphics::DrawFillCircle(tulli->GetBody()->position.x, tulli->GetBody()->position.y, circle->radius, 0xFFFFFFAA);
-    }
-
-    if (ship)
-    {
-        if (showVectors && ship->GetBody()->shape->GetType() == CIRCLE)
-        {
-            CircleShape* circle = static_cast<CircleShape*>(ship->GetBody()->shape);
-            Vec2 velocityVector = ship->GetBody()->velocity;
-            velocityVector.Normalize();
-
-            Graphics::DrawLine(
-                ship->GetBody()->position.x,
-                ship->GetBody()->position.y,
-                ship->GetBody()->position.x + velocityVector.x * circle->radius * 3.0f,
-                ship->GetBody()->position.y + velocityVector.y * circle->radius * 3.0f,
-                0xFFFFFF00, false);
-
-            Graphics::DrawLine(
-                ship->GetBody()->position.x,
-                ship->GetBody()->position.y,
-                ship->GetBody()->position.x + ship->GetThrustVector().x * circle->radius * 3.0f,
-                ship->GetBody()->position.y + ship->GetThrustVector().y * circle->radius * 3.0f,
-                0xFFFF0000, false);
-        }
-
-        if (ship->GetBody()->shape->GetType() == CIRCLE)
-        {
-            CircleShape* circle = static_cast<CircleShape*>(ship->GetBody()->shape);
-            Graphics::DrawFillCircle(ship->GetBody()->position.x, ship->GetBody()->position.y, circle->radius, 0xFFFFAA00);
-        }
-
-        if (showTrajectory)
-        {
-            Body dummyParticle(*ship->GetBody());
-            Body dummyMoon(*tulli->GetBody());
-
-            Vec2 attraction;
-            Vec2 acceleration;
-
-            Vec2 lastPosition;
-
-            Contact contact;
-
-            for (int i = 0; i < 500; i++)
-            {
-                lastPosition = dummyParticle.position;
-
-                attraction = Force::GenerateGravitationalForce(dummyParticle, dummyMoon, G, 0, 100);
-                dummyParticle.acceleration = attraction * dummyParticle.invMass;
-                dummyParticle.velocity += dummyParticle.acceleration * 0.5f;
-                dummyParticle.position += dummyParticle.velocity * 0.5f;
-
-                if (CollisionDetection::IsColliding(&dummyParticle, &dummyMoon, contact)) break;
-
-                Graphics::DrawPixel(dummyParticle.position.x + Graphics::screenOffset.x, dummyParticle.position.y + Graphics::screenOffset.y, 0xFFAAAAFF);
-            }
-        }
-    }
+    tulli->Render();
+    yobo->Render();
+    ship->Render(showVectors, showTrajectory, nearestSatellite);
 
     if(showTutorial)
         RenderTutorialText();
-    if (ship)
-        RenderUI();
-
-    Graphics::DrawString(
-        tulli->GetBody()->position.x - Font::GetStringFontLength("tulli") * 0.5f,
-        tulli->GetBody()->position.y - Font::fontHeight * 0.5f,
-        "tulli",
-        0xFF000000, false);
+    
+    RenderUI();    
 
     Graphics::RenderFrame();
 
@@ -359,14 +329,14 @@ void Application::RenderTutorialText()
 
 void Application::RenderUI()
 {
-    Graphics::DrawString(10, Graphics::ScreenHeight() - 310, std::to_string(Graphics::screenZoom).c_str(), 0xFFADD8E6, true);
+    //Graphics::DrawString(10, Graphics::ScreenHeight() - 280, std::to_string(Graphics::screenZoom).c_str(), 0xFFADD8E6, true);
 
     const char* timeAccelString = "time acceleration: x ";
-    Graphics::DrawString(10, Graphics::ScreenHeight() - 300, timeAccelString, 0xFFADD8E6, true);
+    Graphics::DrawString(10, Graphics::ScreenHeight() - 270, timeAccelString, 0xFFADD8E6, true);
 
     Graphics::DrawString(
         10 + Font::GetStringFontLength(timeAccelString),
-        Graphics::ScreenHeight() - 300.0f,
+        Graphics::ScreenHeight() - 270,
         std::to_string(timeAccelerationSpeeds[timeAccelIndex]).c_str(),
         0xFFADD8E6, true);
 

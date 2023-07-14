@@ -54,5 +54,5 @@ struct Graphics
     static void DrawChar(const int& x, const int& y, const char& character, const uint32_t& color, const bool& lockToScreen);
     static void DrawString(const int& x, const int& y, const char* string, const uint32_t& color, const bool& lockToScreen);
 
-    static void DisplayBresenhamCircle(const int& xc, const int& yc, const int& x0, const int& y0, const uint32_t& color);
+    static void DisplayBresenhamCircle(const int& xc, const int& yc, const int& x0, const int& y0, const uint32_t& color, const bool& lockToScreen);
 };

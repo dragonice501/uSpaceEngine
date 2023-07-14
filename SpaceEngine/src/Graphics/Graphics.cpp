@@ -199,7 +199,7 @@ void Graphics::DrawCircle(const int& x, const int& y, const int& radius, const f
     int y0 = radius;
     int p0 = 3 - (2 * radius);
 
-    DisplayBresenhamCircle(x, y, x0, y0, color);
+    DisplayBresenhamCircle(x, y, x0, y0, color, lockToScreen);
 
     while (y0 >= x0)
     {
@@ -215,10 +215,10 @@ void Graphics::DrawCircle(const int& x, const int& y, const int& radius, const f
             p0 += 4 * x0 + 6;
         }
 
-        DisplayBresenhamCircle(x, y, x0, y0, color);
+        DisplayBresenhamCircle(x, y, x0, y0, color, lockToScreen);
     }
 
-    DrawLine(x, y, x + cos(angle) * radius, y + sin(angle) * radius, color, lockToScreen);
+    //DrawLine(x, y, x + cos(angle) * radius, y + sin(angle) * radius, color, lockToScreen);
 }
 
 void Graphics::DrawFillCircle(const int& x, const int& y, const int& radius, const uint32_t& color)
@@ -299,14 +299,28 @@ void Graphics::DrawString(const int& x, const int& y, const char* string, const 
     }
 }
 
-void Graphics::DisplayBresenhamCircle(const int& xc, const int& yc, const int& x0, const int& y0, const uint32_t& color)
+void Graphics::DisplayBresenhamCircle(const int& xc, const int& yc, const int& x0, const int& y0, const uint32_t& color, const bool& lockToScreen)
 {
-    DrawPixel(xc + x0, yc + y0, color);
-    DrawPixel(xc - x0, yc + y0, color);
-    DrawPixel(xc + x0, yc - y0, color);
-    DrawPixel(xc - x0, yc - y0, color);
-    DrawPixel(xc + y0, yc + x0, color);
-    DrawPixel(xc - y0, yc + x0, color);
-    DrawPixel(xc + y0, yc - x0, color);
-    DrawPixel(xc - y0, yc - x0, color);
+    if (lockToScreen)
+    {
+        DrawPixel(xc + x0, yc + y0, color);
+        DrawPixel(xc - x0, yc + y0, color);
+        DrawPixel(xc + x0, yc - y0, color);
+        DrawPixel(xc - x0, yc - y0, color);
+        DrawPixel(xc + y0, yc + x0, color);
+        DrawPixel(xc - y0, yc + x0, color);
+        DrawPixel(xc + y0, yc - x0, color);
+        DrawPixel(xc - y0, yc - x0, color);
+    }
+    else
+    {
+        DrawPixel(xc + x0 + screenOffset.x, yc + y0 + screenOffset.y, color);
+        DrawPixel(xc - x0 + screenOffset.x, yc + y0 + screenOffset.y, color);
+        DrawPixel(xc + x0 + screenOffset.x, yc - y0 + screenOffset.y, color);
+        DrawPixel(xc - x0 + screenOffset.x, yc - y0 + screenOffset.y, color);
+        DrawPixel(xc + y0 + screenOffset.x, yc + x0 + screenOffset.y, color);
+        DrawPixel(xc - y0 + screenOffset.x, yc + x0 + screenOffset.y, color);
+        DrawPixel(xc + y0 + screenOffset.x, yc - x0 + screenOffset.y, color);
+        DrawPixel(xc - y0 + screenOffset.x, yc - x0 + screenOffset.y, color);
+    }
 }

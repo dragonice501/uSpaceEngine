@@ -25,8 +25,8 @@ public:
     inline void TurnRightPressed(const bool& pressed) { turnRightPressed = pressed; }
     inline void TurnLeftPressed(const bool& pressed) { turnLeftPressed = pressed; }
 
-    void Update(float dt, const Satellite* satellite);
-    void Render();
+    void Update(const float& dt, const Satellite* satellite);
+    void Render(const bool& showVectors, const bool& showTrajectory, const Satellite* satellite);
 
 private:
 	Body* body;
@@ -42,7 +42,7 @@ private:
     float thrust = 1.0f;
     Vec2 thrustVector = { 0.0f, -1.0f };
 
-    float turnSpeed = 1.0f;
+    float turnSpeed = 0.5f;
 
     float fuel = 1.0f;
     float fuelMaxBurnRate = 0.01f;

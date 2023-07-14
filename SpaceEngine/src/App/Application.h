@@ -19,6 +19,11 @@ class Application
 
         Ship* ship = nullptr;
         Satellite* tulli = nullptr;
+        Satellite* yobo = nullptr;
+
+        std::vector<Satellite*> satellites;
+        std::vector<Satellite*> influencingSatellites;
+        Satellite* nearestSatellite = nullptr;
 
         bool mouseButtonDown = false;
         Vec2 screenOffset = { 0.0f, 0.0f };

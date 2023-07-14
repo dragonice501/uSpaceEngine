@@ -2,6 +2,8 @@
 #include "../Graphics/Graphics.h"
 #include "../Phsyics/Force.h"
 #include "../Phsyics/PhysicsConstants.h"
+#include "../Phsyics/Contact.h"
+#include "../Phsyics/CollisionDetection.h"
 
 Ship::Ship()
 {
@@ -17,7 +19,7 @@ Ship::~Ship()
 	delete body;
 }
 
-void Ship::Update(float dt, const Satellite* satellite)
+void Ship::Update(const float& dt, const Satellite* satellite)
 {
     if (throttleForwardPressed)
     {
@@ -41,8 +43,11 @@ void Ship::Update(float dt, const Satellite* satellite)
         thrustVector = thrustVector.Rotate(-M_PI * turnSpeed * dt);
     }
 
-    Vec2 attraction = Force::GenerateGravitationalForce(*body, *satellite->GetBody(), G, 0, 100);
-    body->AddForce(attraction);
+    if (satellite)
+    {
+        Vec2 attraction = Force::GenerateGravitationalForce(*body, *satellite->GetBody(), G, 0, 100);
+        body->AddForce(attraction);
+    }
 
     if (throttle != 0.0f && fuel != 0.0f)
     {
@@ -54,6 +59,75 @@ void Ship::Update(float dt, const Satellite* satellite)
     body->Update(dt);
 }
 
-void Ship::Render()
+void Ship::Render(const bool& showVectors, const bool& showTrajectory, const Satellite* satellite)
 {
+    CircleShape* circle = static_cast<CircleShape*>(body->shape);
+    if (showVectors && body->shape->GetType() == CIRCLE)
+    {
+        Vec2 velocityVector = body->velocity;
+        velocityVector.Normalize();
+
+        Graphics::DrawLine(
+            body->position.x,
+            body->position.y,
+            body->position.x + velocityVector.x * circle->radius * 3.0f,
+            body->position.y + velocityVector.y * circle->radius * 3.0f,
+            0xFFFFFF00, false);
+
+        Graphics::DrawLine(
+            body->position.x,
+            body->position.y,
+            body->position.x + GetThrustVector().x * circle->radius * 3.0f,
+            body->position.y + GetThrustVector().y * circle->radius * 3.0f,
+            0xFFFF0000, false);
+    }
+
+    if (satellite)
+    {
+        CircleShape* circle = static_cast<CircleShape*>(body->shape);
+        Vec2 vector = satellite->GetBody()->position - body->position;
+        vector.Normalize();
+
+        Graphics::DrawLine(
+            body->position.x,
+            body->position.y,
+            body->position.x + vector.x * circle->radius * 3.0f,
+            body->position.y + vector.y * circle->radius * 3.0f,
+            satellite->GetColor(), false);
+
+        if (showTrajectory)
+        {
+            Body dummyBody(*body);
+            Body dummyMoon(*satellite->GetBody());
+
+            Vec2 attraction;
+            Vec2 acceleration;
+
+            Vec2 lastPosition;
+
+            Contact contact;
+
+            for (int i = 0; i < 300; i++)
+            {
+                lastPosition = dummyBody.position;
+
+                attraction = Force::GenerateGravitationalForce(dummyBody, dummyMoon, G, 0, satellite->GetSOI());
+
+                dummyBody.acceleration = attraction * dummyBody.invMass;
+                dummyBody.velocity += dummyBody.acceleration * 0.5f;
+                dummyBody.position += dummyBody.velocity * 0.5f;
+
+                dummyMoon.position += dummyMoon.velocity;
+
+                if (CollisionDetection::IsColliding(&dummyBody, &dummyMoon, contact)) break;
+
+                Graphics::DrawPixel(dummyBody.position.x + Graphics::screenOffset.x, dummyBody.position.y + Graphics::screenOffset.y, 0xFFAAAAFF);
+            }
+        }
+    }
+
+    if (body->shape->GetType() == CIRCLE)
+    {
+        Graphics::DrawFillCircle(body->position.x, body->position.y, circle->radius, 0xFFFFAA00);
+    }
 }
