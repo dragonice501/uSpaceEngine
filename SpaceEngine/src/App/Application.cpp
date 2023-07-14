@@ -436,22 +436,31 @@ void Application::RenderUI()
         std::to_string(Force::GenerateGravitationalForce(*ship, *moon, G, 0, 100).Magnitude()).c_str(), 0xFFADD8E6);*/
 
     const char* altitudeString = "altitude: ";
-    Graphics::DrawString(10, Graphics::ScreenHeight() - 100, altitudeString, 0xFFADD8E6, true);
+    Graphics::DrawString(10, Graphics::ScreenHeight() - 110, altitudeString, 0xFFADD8E6, true);
 
     CircleShape* moonShape = static_cast<CircleShape*>(moon->shape);
     CircleShape* shipShape = static_cast<CircleShape*>(ship->shape);
     Graphics::DrawString(
         10 + Font::GetStringFontLength(altitudeString),
-        Graphics::ScreenHeight() - 100,
+        Graphics::ScreenHeight() - 110,
         std::to_string((ship->position - moon->position).Magnitude() - moonShape->radius - shipShape->radius).c_str(),
         0xFFADD8E6, true);
 
     const char* velocityString = "velocity: ";
-    Graphics::DrawString(10, Graphics::ScreenHeight() - 90, velocityString, 0xFFADD8E6, true);
+    Graphics::DrawString(10, Graphics::ScreenHeight() - 100, velocityString, 0xFFADD8E6, true);
     Graphics::DrawString(
         10 + Font::GetStringFontLength(velocityString),
-        Graphics::ScreenHeight() - 90,
+        Graphics::ScreenHeight() - 100,
         std::to_string(ship->velocity.Magnitude()).c_str(),
+        0xFFADD8E6, true);
+
+    float foeDot = (thrustVector.UnitVector().Dot((ship->position - moon->position).UnitVector())) * 90.0f;
+    const char* foeString = "foe: ";
+    Graphics::DrawString(10, Graphics::ScreenHeight() - 90, foeString, 0xFFADD8E6, true);
+    Graphics::DrawString(
+        10 + Font::GetStringFontLength(foeString),
+        Graphics::ScreenHeight() - 90,
+        std::to_string(foeDot).c_str(),
         0xFFADD8E6, true);
 
     const char* fuelString = "fuel: ";
