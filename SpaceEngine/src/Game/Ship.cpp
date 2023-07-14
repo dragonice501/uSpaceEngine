@@ -45,7 +45,7 @@ void Ship::Update(const float& dt, const Satellite* satellite)
 
     if (satellite)
     {
-        Vec2 attraction = Force::GenerateGravitationalForce(*body, *satellite->GetBody(), G, 0, 100);
+        Vec2 attraction = Force::GenerateGravitationalForce(*body, *satellite->GetBody(), G, 0, satellite->GetSOI());
         body->AddForce(attraction);
     }
 

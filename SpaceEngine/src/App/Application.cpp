@@ -245,7 +245,7 @@ void Application::Update()
 
     float nearestDistance = std::numeric_limits<float>::max();
     nearestSatellite = nullptr;
-    for (Satellite* satellite : satellites)
+    for (Satellite* satellite : influencingSatellites)
     {
         float distance = (ship->GetBody()->position - satellite->GetBody()->position).MagnitudeSquared();
         if (distance < nearestDistance)
