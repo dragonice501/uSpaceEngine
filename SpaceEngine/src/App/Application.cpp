@@ -25,15 +25,15 @@ void Application::Setup()
     CircleShape* tulliShape = static_cast<CircleShape*>(tulli->GetBody()->shape);
     satellites.push_back(tulli);
 
-    yobo = new Satellite(Graphics::ScreenWidth() - 100, Graphics::ScreenHeight() * 0.5f, 30.0f, 30.0f, 100.0f);
+    yobo = new Satellite(Graphics::ScreenWidth() - 100, Graphics::ScreenHeight() * 0.5f, 30.0f, 70.0f, 100.0f);
     yobo->SetColor(0xFFAAFFAA);
     yobo->GetBody()->resolvePentration = false;
-    yobo->GetBody()->velocity = { 0.0f, -16.9f };
+    yobo->GetBody()->velocity = { 0.0f, -17.25f };
     satellites.push_back(yobo);
 
     ship = new Ship(0.0f, 0.0f, 5.0f, 1.0f);
     CircleShape* shape = static_cast<CircleShape*>(ship->GetBody()->shape);
-    ship->GetBody()->position = Vec2(tulli->GetBody()->position.x, tulli->GetBody()->position.y - tulliShape->radius - shape->radius);
+    ship->GetBody()->position = Vec2(tulli->GetBody()->position.x, yobo->GetBody()->position.y - tulliShape->radius - shape->radius);
     ship->GetBody()->restitution = 0.5f;
 }
 
