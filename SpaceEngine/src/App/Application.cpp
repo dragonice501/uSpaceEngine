@@ -19,19 +19,19 @@ void Application::Setup()
 {
     running = Graphics::OpenWindow();
 
-    tulli = new Satellite(Graphics::ScreenWidth() * 0.5f, Graphics::ScreenHeight() * 0.5f, 150.0f, 150.0f, 400.0f);
+    tulli = new Satellite(Graphics::ScreenWidth() * 0.5f, Graphics::ScreenHeight() * 0.5f, 150.0f, 150.0f, 400.0f, nullptr);
     tulli->SetColor(0xFFFFFFAA);
     tulli->GetBody()->resolvePentration = false;
     CircleShape* tulliShape = static_cast<CircleShape*>(tulli->GetBody()->shape);
     satellites.push_back(tulli);
 
-    yobo = new Satellite(Graphics::ScreenWidth() - 100, Graphics::ScreenHeight() * 0.5f, 30.0f, 70.0f, 100.0f);
+    yobo = new Satellite(Graphics::ScreenWidth() - 100, Graphics::ScreenHeight() * 0.5f, 30.0f, 70.0f, 100.0f, tulli);
     yobo->SetColor(0xFFAAFFAA);
     yobo->GetBody()->resolvePentration = false;
     yobo->GetBody()->velocity = { 0.0f, -17.25f };
     satellites.push_back(yobo);
 
-    ship = new Ship(0.0f, 0.0f, 5.0f, 1.0f);
+    ship = new Ship(0.0f, 0.0f, 5.0f, 1.0f, tulli);
     CircleShape* shape = static_cast<CircleShape*>(ship->GetBody()->shape);
     ship->GetBody()->position = Vec2(tulli->GetBody()->position.x, yobo->GetBody()->position.y - tulliShape->radius - shape->radius);
     ship->GetBody()->restitution = 0.5f;
@@ -40,8 +40,11 @@ void Application::Setup()
 void Application::Destroy()
 {
     delete ship;
-    delete tulli;
-    delete yobo;
+
+    for (Satellite* satellite : satellites)
+    {
+        delete satellite;
+    }
 
     Graphics::CloseWindow();
 }
@@ -134,12 +137,12 @@ void Application::Input() {
 
                 if (event.key.keysym.sym == SDLK_v)
                 {
-                    showVectors = !showVectors;
+                    ship->SetShowVectors(!ship->GetShowVectors());
                     break;
                 }
                 if (event.key.keysym.sym == SDLK_t)
                 {
-                    showTrajectory = !showTrajectory;
+                    ship->SetShowTrajectory(!ship->GetShowTrajectory());
                     break;
                 }
 
@@ -252,11 +255,14 @@ void Application::Update()
         {
             nearestDistance = distance;
             nearestSatellite = satellite;
+            ship->SetInfluencingSatellite(satellite);
         }
     }
 
-    ship->Update(deltaTime, nearestSatellite);
-    yobo->Update(deltaTime, tulli);
+    ship->Update(deltaTime);
+
+    for (Satellite* satellite : satellites)
+        satellite->Update(deltaTime);
 
     if (nearestSatellite)
     {
@@ -272,9 +278,9 @@ void Application::Update()
 
 void Application::Render()
 {
-    tulli->Render();
-    yobo->Render();
-    ship->Render(showVectors, showTrajectory, nearestSatellite);
+    for (Satellite* satellite : satellites)
+        satellite->Render();
+    ship->Render();
 
     if(showTutorial)
         RenderTutorialText();

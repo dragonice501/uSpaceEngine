@@ -9,9 +9,10 @@ Ship::Ship()
 {
 }
 
-Ship::Ship(const float& x, const float& y, const int& radius, const float& mass)
+Ship::Ship(const float& x, const float& y, const int& radius, const float& mass, Satellite* influencingSatellite)
 {
 	body = new Body(CircleShape(radius), x, y, mass);
+    this->influencingSatellite = influencingSatellite;
 }
 
 Ship::~Ship()
@@ -19,7 +20,7 @@ Ship::~Ship()
 	delete body;
 }
 
-void Ship::Update(const float& dt, const Satellite* satellite)
+void Ship::Update(const float& dt)
 {
     if (throttleForwardPressed)
     {
@@ -43,9 +44,9 @@ void Ship::Update(const float& dt, const Satellite* satellite)
         thrustVector = thrustVector.Rotate(-M_PI * turnSpeed * dt);
     }
 
-    if (satellite)
+    if (influencingSatellite)
     {
-        Vec2 attraction = Force::GenerateGravitationalForce(*body, *satellite->GetBody(), G, 0, satellite->GetSOI());
+        Vec2 attraction = Force::GenerateGravitationalForce(*body, *influencingSatellite->GetBody(), G, 0, influencingSatellite->GetSOI());
         body->AddForce(attraction);
     }
 
@@ -59,7 +60,7 @@ void Ship::Update(const float& dt, const Satellite* satellite)
     body->Update(dt);
 }
 
-void Ship::Render(const bool& showVectors, const bool& showTrajectory, const Satellite* satellite)
+void Ship::Render()
 {
     CircleShape* circle = static_cast<CircleShape*>(body->shape);
     if (showVectors && body->shape->GetType() == CIRCLE)
@@ -82,10 +83,10 @@ void Ship::Render(const bool& showVectors, const bool& showTrajectory, const Sat
             0xFFFF0000, false);
     }
 
-    if (satellite)
+    if (influencingSatellite)
     {
         CircleShape* circle = static_cast<CircleShape*>(body->shape);
-        Vec2 vector = satellite->GetBody()->position - body->position;
+        Vec2 vector = influencingSatellite->GetBody()->position - body->position;
         vector.Normalize();
 
         Graphics::DrawLine(
@@ -93,12 +94,12 @@ void Ship::Render(const bool& showVectors, const bool& showTrajectory, const Sat
             body->position.y,
             body->position.x + vector.x * circle->radius * 3.0f,
             body->position.y + vector.y * circle->radius * 3.0f,
-            satellite->GetColor(), false);
+            influencingSatellite->GetColor(), false);
 
         if (showTrajectory)
         {
             Body dummyBody(*body);
-            Body dummyMoon(*satellite->GetBody());
+            Body dummyMoon(*influencingSatellite->GetBody());
 
             Vec2 attraction;
             Vec2 acceleration;
@@ -111,7 +112,7 @@ void Ship::Render(const bool& showVectors, const bool& showTrajectory, const Sat
             {
                 lastPosition = dummyBody.position;
 
-                attraction = Force::GenerateGravitationalForce(dummyBody, dummyMoon, G, 0, satellite->GetSOI());
+                attraction = Force::GenerateGravitationalForce(dummyBody, dummyMoon, G, 0, influencingSatellite->GetSOI());
 
                 dummyBody.acceleration = attraction * dummyBody.invMass;
                 dummyBody.velocity += dummyBody.acceleration * 0.5f;

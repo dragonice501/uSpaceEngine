@@ -28,8 +28,6 @@ class Application
         bool mouseButtonDown = false;
         Vec2 screenOffset = { 0.0f, 0.0f };
 
-        bool showVectors = true;
-        bool showTrajectory = true;
         bool showTutorial = true;
 
     public:
