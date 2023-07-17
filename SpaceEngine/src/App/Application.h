@@ -23,7 +23,6 @@ class Application
 
         std::vector<Satellite*> satellites;
         std::vector<Satellite*> influencingSatellites;
-        Satellite* nearestSatellite = nullptr;
 
         bool mouseButtonDown = false;
         Vec2 screenOffset = { 0.0f, 0.0f };

@@ -246,16 +246,28 @@ void Application::Update()
         }
     }
 
-    float nearestDistance = std::numeric_limits<float>::max();
-    nearestSatellite = nullptr;
-    for (Satellite* satellite : influencingSatellites)
+    if (satellites.size() > 0)
     {
-        float distance = (ship->GetBody()->position - satellite->GetBody()->position).MagnitudeSquared();
-        if (distance < nearestDistance)
+        bool insideSOI = false;
+        float nearestDistance = std::numeric_limits<float>::max();
+        for (Satellite* satellite : influencingSatellites)
         {
-            nearestDistance = distance;
-            nearestSatellite = satellite;
-            ship->SetInfluencingSatellite(satellite);
+            bool insideSatelliteSoi = (ship->GetBody()->position - satellite->GetBody()->position).MagnitudeSquared() < satellite->GetSOI() * satellite->GetSOI();
+            if (insideSatelliteSoi)
+            {
+                insideSOI = true;
+                float distance = (ship->GetBody()->position - satellite->GetBody()->position).MagnitudeSquared();
+                if (distance < nearestDistance)
+                {
+                    nearestDistance = distance;
+                    ship->SetInfluencingSatellite(satellite);
+                }
+            }
+        }
+
+        if (!insideSOI)
+        {
+            ship->SetInfluencingSatellite(nullptr);
         }
     }
 
@@ -264,14 +276,7 @@ void Application::Update()
     for (Satellite* satellite : satellites)
         satellite->Update(deltaTime);
 
-    if (nearestSatellite)
-    {
-        Contact contact;
-        if (CollisionDetection::IsColliding(ship->GetBody(), nearestSatellite->GetBody(), contact))
-        {
-            contact.ResolveCollision();
-        }
-    }
+    ship->CheckCollision();
 
     influencingSatellites.clear();
 }

@@ -6,7 +6,7 @@ class Satellite
 {
 public:
 	Satellite();
-	Satellite(const char newName[8], const float& x, const float& y, const float& radius, const float& mass, const float& soi, Satellite* influencingSatellite);
+	Satellite(const char* newName, const float& x, const float& y, const float& radius, const float& mass, const float& soi, Satellite* influencingSatellite);
 	~Satellite();
 
 	inline Body* GetBody() const { return body; }

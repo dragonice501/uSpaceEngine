@@ -8,7 +8,7 @@ Satellite::Satellite()
 {
 }
 
-Satellite::Satellite(const char newName[8], const float& x, const float& y, const float& radius, const float& mass, const float& soi, Satellite* influencingSatellite)
+Satellite::Satellite(const char* newName, const float& x, const float& y, const float& radius, const float& mass, const float& soi, Satellite* influencingSatellite)
 {
 	body = new Body(CircleShape(radius), x, y, mass);
 	this->influencingSatellite = influencingSatellite;

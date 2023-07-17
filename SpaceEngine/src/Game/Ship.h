@@ -35,6 +35,8 @@ public:
     void Update(const float& dt);
     void Render();
 
+    void CheckCollision();
+
 private:
 	Body* body;
     Satellite* influencingSatellite;

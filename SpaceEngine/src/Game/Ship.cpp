@@ -132,3 +132,15 @@ void Ship::Render()
         Graphics::DrawFillCircle(body->position.x, body->position.y, circle->radius, 0xFFFFAA00);
     }
 }
+
+void Ship::CheckCollision()
+{
+    if (influencingSatellite)
+    {
+        Contact contact;
+        if (CollisionDetection::IsCollidingCircleCircle(body, influencingSatellite->GetBody(), contact))
+        {
+            contact.ResolveCollision();
+        }
+    }
+}
