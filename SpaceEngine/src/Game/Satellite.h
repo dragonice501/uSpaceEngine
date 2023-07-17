@@ -6,7 +6,7 @@ class Satellite
 {
 public:
 	Satellite();
-	Satellite(const float& x, const float& y, const float& radius, const float& mass, const float& soi, Satellite* influencingSatellite);
+	Satellite(const char newName[8], const float& x, const float& y, const float& radius, const float& mass, const float& soi, Satellite* influencingSatellite);
 	~Satellite();
 
 	inline Body* GetBody() const { return body; }
@@ -26,5 +26,5 @@ private:
 	float sphereOfInfluence = 0.0f;
 
 	uint32_t color;
-	char name[];
+	char name[8];
 };

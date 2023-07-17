@@ -8,12 +8,19 @@ Satellite::Satellite()
 {
 }
 
-Satellite::Satellite(const float& x, const float& y, const float& radius, const float& mass, const float& soi, Satellite* influencingSatellite)
+Satellite::Satellite(const char newName[8], const float& x, const float& y, const float& radius, const float& mass, const float& soi, Satellite* influencingSatellite)
 {
 	body = new Body(CircleShape(radius), x, y, mass);
 	this->influencingSatellite = influencingSatellite;
 
 	sphereOfInfluence = soi;
+	
+	int i = 0;
+	while (newName[i] != '\0')
+	{
+		name[i] = newName[i];
+		i++;
+	}
 }
 
 Satellite::~Satellite()
@@ -45,8 +52,8 @@ void Satellite::Render()
 	Graphics::DrawCircle(body->position.x, body->position.y, sphereOfInfluence, 0.0f, color, false);
 
 	Graphics::DrawString(
-		body->position.x - Font::GetStringFontLength("tulli") * 0.5f,
+		body->position.x - Font::GetStringFontLength(name) * 0.5f,
 		body->position.y - Font::fontHeight * 0.5f,
-		"tulli",
+		name,
 		0xFF000000, false);
 }

@@ -19,13 +19,13 @@ void Application::Setup()
 {
     running = Graphics::OpenWindow();
 
-    tulli = new Satellite(Graphics::ScreenWidth() * 0.5f, Graphics::ScreenHeight() * 0.5f, 150.0f, 150.0f, 400.0f, nullptr);
+    tulli = new Satellite("Tulli", Graphics::ScreenWidth() * 0.5f, Graphics::ScreenHeight() * 0.5f, 150.0f, 150.0f, 400.0f, nullptr);
     tulli->SetColor(0xFFFFFFAA);
     tulli->GetBody()->resolvePentration = false;
     CircleShape* tulliShape = static_cast<CircleShape*>(tulli->GetBody()->shape);
     satellites.push_back(tulli);
 
-    yobo = new Satellite(Graphics::ScreenWidth() - 100, Graphics::ScreenHeight() * 0.5f, 30.0f, 70.0f, 100.0f, tulli);
+    yobo = new Satellite("Yobo", Graphics::ScreenWidth() - 100, Graphics::ScreenHeight() * 0.5f, 30.0f, 70.0f, 100.0f, tulli);
     yobo->SetColor(0xFFAAFFAA);
     yobo->GetBody()->resolvePentration = false;
     yobo->GetBody()->velocity = { 0.0f, -17.25f };
