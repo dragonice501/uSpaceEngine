@@ -13,90 +13,123 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Engine">
+      <UniqueIdentifier>{c7f5ae08-d825-4e48-90ff-88dbee8a6c37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine">
+      <UniqueIdentifier>{23307ae9-481b-4d52-ba3d-47550333703f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GameObjects">
+      <UniqueIdentifier>{7dfe088a-b85d-42b2-b622-80ff94cc9398}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GameObjects">
+      <UniqueIdentifier>{5f5daee4-8326-4574-9998-e661f63646a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utils">
+      <UniqueIdentifier>{bb0c793e-0c34-40a4-8f1f-7ecc6e8ade23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{a7b475e8-62ef-4ee0-bc04-ae80861fe7a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics">
+      <UniqueIdentifier>{9deb0862-a1be-4ce8-9a80-97c35ef60e76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics">
+      <UniqueIdentifier>{db9e2aa9-19ea-4cb0-9cef-2275a2cc2c47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Physics">
+      <UniqueIdentifier>{e76c0c17-dc90-4a34-82a4-2fbef02b544a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Physics">
+      <UniqueIdentifier>{ba839582-b74e-4102-8608-e76848b3a11a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\App\Application.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Engine.cpp">
+      <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphics\Graphics.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Satellite.cpp">
+      <Filter>Source Files\GameObjects</Filter>
     </ClCompile>
-    <ClCompile Include="src\Phsyics\Body.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Ship.cpp">
+      <Filter>Source Files\GameObjects</Filter>
     </ClCompile>
-    <ClCompile Include="src\Phsyics\Vec2.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Vec2.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="src\Phsyics\Force.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Utils.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphics\Font.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Graphics.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Phsyics\Shape.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Font.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Phsyics\CollisionDetection.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Force.cpp">
+      <Filter>Source Files\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Phsyics\Contact.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Body.cpp">
+      <Filter>Source Files\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Utils\Utils.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\CollisionDetection.cpp">
+      <Filter>Source Files\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\Ship.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Contact.cpp">
+      <Filter>Source Files\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\Satellite.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Shape.cpp">
+      <Filter>Source Files\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\App\Application.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Engine.h">
+      <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="src\Graphics\Graphics.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Ship.h">
+      <Filter>Header Files\GameObjects</Filter>
     </ClInclude>
-    <ClInclude Include="src\Phsyics\Body.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Satellite.h">
+      <Filter>Header Files\GameObjects</Filter>
     </ClInclude>
-    <ClInclude Include="src\Phsyics\Vec2.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Vec2.h">
+      <Filter>Header Files\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="src\Phsyics\PhysicsConstants.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Utils.h">
+      <Filter>Header Files\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="src\Phsyics\Force.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\GraphicsConstants.h">
+      <Filter>Header Files\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="src\Graphics\Font.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\PhysicsConstants.h">
+      <Filter>Header Files\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="src\Phsyics\Shape.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Graphics.h">
+      <Filter>Header Files\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="src\Graphics\GraphicsConstants.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Contact.h">
+      <Filter>Header Files\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="src\Phsyics\CollisionDetection.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\CollisionDetection.h">
+      <Filter>Header Files\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="src\Phsyics\Contact.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Font.h">
+      <Filter>Header Files\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils\Utils.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Force.h">
+      <Filter>Header Files\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\Ship.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Shape.h">
+      <Filter>Header Files\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\Satellite.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="CelestialBody.h">
+      <Filter>Header Files\GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Body.h">
+      <Filter>Header Files\Physics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

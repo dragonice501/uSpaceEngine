@@ -1,8 +1,8 @@
 #include "Satellite.h"
-#include "../Phsyics/Force.h"
-#include "../Phsyics/PhysicsConstants.h"
-#include "../Graphics/Graphics.h"
-#include "../Graphics/Font.h"
+#include "Force.h"
+#include "PhysicsConstants.h"
+#include "Graphics.h"
+#include "Font.h"
 
 Satellite::Satellite()
 {
@@ -34,7 +34,7 @@ void Satellite::Update(const float& dt)
 {
 	if (influencingSatellite)
 	{
-		Vec2 attraction = Force::GenerateGravitationalForce(*body, *influencingSatellite->GetBody(), G, 0, 100);
+		Vec2 attraction = Force::GenerateGravitationalForce(*body, *influencingSatellite->GetBody(), G, 0, influencingSatellite->GetSOI());
 		body->AddForce(attraction);
 	}
 

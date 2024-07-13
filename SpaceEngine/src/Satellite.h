@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Phsyics/Body.h"
+#include "Body.h"
 
 class Satellite
 {

@@ -3,12 +3,12 @@
 #include "Graphics.h"
 #include "Body.h"
 
-#include "../Game/Ship.h"
-#include "../Game/Satellite.h"
+#include "Ship.h"
+#include "Satellite.h"
 
 #include <vector>
 
-class Application
+class Engine
 {
     private:
         bool running = false;
@@ -30,8 +30,8 @@ class Application
         bool showTutorial = true;
 
     public:
-        Application() = default;
-        ~Application() = default;
+        Engine() = default;
+        ~Engine() = default;
 
         void Setup();
         void Destroy();

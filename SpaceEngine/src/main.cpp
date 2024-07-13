@@ -1,8 +1,8 @@
-#include "Application.h"
+#include "Engine.h"
 
 int main(int argv, char* argc[])
 {
-    Application app;
+    Engine app;
     app.Setup();
 
     while (app.IsRunning())

@@ -132,35 +132,36 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\App\Application.cpp" />
-    <ClCompile Include="src\Game\Satellite.cpp" />
-    <ClCompile Include="src\Game\Ship.cpp" />
-    <ClCompile Include="src\Graphics\Font.cpp" />
-    <ClCompile Include="src\Graphics\Graphics.cpp" />
+    <ClCompile Include="src\Engine.cpp" />
+    <ClCompile Include="src\Satellite.cpp" />
+    <ClCompile Include="src\Ship.cpp" />
+    <ClCompile Include="src\Font.cpp" />
+    <ClCompile Include="src\Graphics.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Phsyics\CollisionDetection.cpp" />
-    <ClCompile Include="src\Phsyics\Contact.cpp" />
-    <ClCompile Include="src\Phsyics\Force.cpp" />
-    <ClCompile Include="src\Phsyics\Body.cpp" />
-    <ClCompile Include="src\Phsyics\Shape.cpp" />
-    <ClCompile Include="src\Phsyics\Vec2.cpp" />
-    <ClCompile Include="src\Utils\Utils.cpp" />
+    <ClCompile Include="src\CollisionDetection.cpp" />
+    <ClCompile Include="src\Contact.cpp" />
+    <ClCompile Include="src\Force.cpp" />
+    <ClCompile Include="src\Body.cpp" />
+    <ClCompile Include="src\Shape.cpp" />
+    <ClCompile Include="src\Vec2.cpp" />
+    <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\App\Application.h" />
-    <ClInclude Include="src\Game\Satellite.h" />
-    <ClInclude Include="src\Game\Ship.h" />
-    <ClInclude Include="src\Graphics\Font.h" />
-    <ClInclude Include="src\Graphics\Graphics.h" />
-    <ClInclude Include="src\Graphics\GraphicsConstants.h" />
-    <ClInclude Include="src\Phsyics\CollisionDetection.h" />
-    <ClInclude Include="src\Phsyics\Contact.h" />
-    <ClInclude Include="src\Phsyics\PhysicsConstants.h" />
-    <ClInclude Include="src\Phsyics\Force.h" />
-    <ClInclude Include="src\Phsyics\Body.h" />
-    <ClInclude Include="src\Phsyics\Shape.h" />
-    <ClInclude Include="src\Phsyics\Vec2.h" />
-    <ClInclude Include="src\Utils\Utils.h" />
+    <ClInclude Include="CelestialBody.h" />
+    <ClInclude Include="src\Engine.h" />
+    <ClInclude Include="src\Satellite.h" />
+    <ClInclude Include="src\Ship.h" />
+    <ClInclude Include="src\Font.h" />
+    <ClInclude Include="src\Graphics.h" />
+    <ClInclude Include="src\GraphicsConstants.h" />
+    <ClInclude Include="src\CollisionDetection.h" />
+    <ClInclude Include="src\Contact.h" />
+    <ClInclude Include="src\PhysicsConstants.h" />
+    <ClInclude Include="src\Force.h" />
+    <ClInclude Include="src\Body.h" />
+    <ClInclude Include="src\Shape.h" />
+    <ClInclude Include="src\Vec2.h" />
+    <ClInclude Include="src\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

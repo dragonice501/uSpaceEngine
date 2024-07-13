@@ -1,21 +1,21 @@
-#include "Application.h"
-#include "../Graphics/GraphicsConstants.h"
-#include "../Graphics/Font.h"
-#include "../Phsyics/Force.h"
-#include "../Phsyics/PhysicsConstants.h"
-#include "../Phsyics/CollisionDetection.h"
-#include "../Phsyics/Contact.h"
-#include "../Utils/Utils.h"
+#include "Engine.h"
+#include "GraphicsConstants.h"
+#include "Font.h"
+#include "Force.h"
+#include "PhysicsConstants.h"
+#include "CollisionDetection.h"
+#include "Contact.h"
+#include "Utils.h"
 
 #include <SDL.h>
 #include <iostream>
 
-bool Application::IsRunning()
+bool Engine::IsRunning()
 {
     return running;
 }
 
-void Application::Setup()
+void Engine::Setup()
 {
     running = Graphics::OpenWindow();
 
@@ -25,19 +25,19 @@ void Application::Setup()
     CircleShape* tulliShape = static_cast<CircleShape*>(tulli->GetBody()->shape);
     satellites.push_back(tulli);
 
-    yobo = new Satellite("Yobo", Graphics::ScreenWidth() - 100, Graphics::ScreenHeight() * 0.5f, 30.0f, 70.0f, 100.0f, tulli);
+    yobo = new Satellite("Yobo", Graphics::ScreenWidth() - 100, Graphics::ScreenHeight() * 0.5f, 30.0f, 30.0f, 100.0f, tulli);
     yobo->SetColor(0xFFAAFFAA);
     yobo->GetBody()->resolvePentration = false;
-    yobo->GetBody()->velocity = { 0.0f, -17.25f };
+    yobo->GetBody()->velocity = { 0.0f, -12.15f };
     satellites.push_back(yobo);
 
     ship = new Ship(0.0f, 0.0f, 5.0f, 1.0f, tulli);
     CircleShape* shape = static_cast<CircleShape*>(ship->GetBody()->shape);
-    ship->GetBody()->position = Vec2(tulli->GetBody()->position.x, yobo->GetBody()->position.y - tulliShape->radius - shape->radius);
+    ship->GetBody()->position = Vec2(tulli->GetBody()->position.x, tulli->GetBody()->position.y - tulliShape->radius - shape->radius);
     ship->GetBody()->restitution = 0.5f;
 }
 
-void Application::Destroy()
+void Engine::Destroy()
 {
     delete ship;
 
@@ -49,7 +49,7 @@ void Application::Destroy()
     Graphics::CloseWindow();
 }
 
-void Application::Input() {
+void Engine::Input() {
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
@@ -223,7 +223,7 @@ void Application::Input() {
     }
 }
 
-void Application::Update()
+void Engine::Update()
 {
     static int timePreviousFrame;
     int timeToWait = MILLISECONDS_PER_FRAME - (SDL_GetTicks() - timePreviousFrame);
@@ -281,7 +281,7 @@ void Application::Update()
     influencingSatellites.clear();
 }
 
-void Application::Render()
+void Engine::Render()
 {
     for (Satellite* satellite : satellites)
         satellite->Render();
@@ -297,7 +297,7 @@ void Application::Render()
     Graphics::ClearScreen(0xFF111122);
 }
 
-void Application::Reset()
+void Engine::Reset()
 {
     CircleShape* shape = static_cast<CircleShape*>(ship->GetBody()->shape);
     CircleShape* moonShape = static_cast<CircleShape*>(tulli->GetBody()->shape);
@@ -315,7 +315,7 @@ void Application::Reset()
     Graphics::ResetScreenOffset();
 }
 
-void Application::RenderTutorialText()
+void Engine::RenderTutorialText()
 {
     Graphics::DrawString(10, 10, "get the rocket into orbit!!!", 0xFFADD8E6, true);
 
@@ -338,7 +338,7 @@ void Application::RenderTutorialText()
     Graphics::DrawString(10, 190, "press 'h' to hide the tutorial", 0xFFADD8E6, true);
 }
 
-void Application::RenderUI()
+void Engine::RenderUI()
 {
     //Graphics::DrawString(10, Graphics::ScreenHeight() - 280, std::to_string(Graphics::screenZoom).c_str(), 0xFFADD8E6, true);
 

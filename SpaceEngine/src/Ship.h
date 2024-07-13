@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Phsyics/Body.h"
+#include "Body.h"
 #include "Satellite.h"
 
 class Ship
@@ -52,7 +52,7 @@ private:
     float throttle = 0.0f;
     float throttleMax = 1.0f;
     float throttleRate = 0.5f;
-    float thrust = 0.5f;
+    float thrust = 0.75f;
     Vec2 thrustVector = { 0.0f, -1.0f };
 
     float turnSpeed = 0.5f;

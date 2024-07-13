@@ -1,9 +1,9 @@
 #include "Ship.h"
-#include "../Graphics/Graphics.h"
-#include "../Phsyics/Force.h"
-#include "../Phsyics/PhysicsConstants.h"
-#include "../Phsyics/Contact.h"
-#include "../Phsyics/CollisionDetection.h"
+#include "Graphics.h"
+#include "Force.h"
+#include "PhysicsConstants.h"
+#include "Contact.h"
+#include "CollisionDetection.h"
 
 Ship::Ship()
 {
@@ -89,12 +89,12 @@ void Ship::Render()
         Vec2 vector = influencingSatellite->GetBody()->position - body->position;
         vector.Normalize();
 
-        Graphics::DrawLine(
+        /*Graphics::DrawLine(
             body->position.x,
             body->position.y,
             body->position.x + vector.x * circle->radius * 3.0f,
             body->position.y + vector.y * circle->radius * 3.0f,
-            influencingSatellite->GetColor(), false);
+            influencingSatellite->GetColor(), false);*/
 
         if (showTrajectory)
         {
@@ -108,7 +108,7 @@ void Ship::Render()
 
             Contact contact;
 
-            for (int i = 0; i < 300; i++)
+            for (int i = 0; i < 500; i++)
             {
                 lastPosition = dummyBody.position;
 
