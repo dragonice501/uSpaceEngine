@@ -19,6 +19,7 @@ struct Graphics
     static SDL_Window* window;
     static SDL_Renderer* renderer;
 
+    static float yAspect;
     static Vec2 screenOffset;
     static float screenZoom;
 
@@ -30,6 +31,7 @@ struct Graphics
     static int ScreenWidth();
     static int ScreenHeight();
 
+    static float YAspect() { return yAspect; }
     static void AdjustScreenOffset(const Vec2& offset);
     static void ResetScreenOffset();
 
@@ -38,7 +40,8 @@ struct Graphics
     static bool CircleOffScreen(const int& x, const int& y, const float& radius);
 
     static void ClearScreen(const uint32_t& color);
-    static void RenderFrame();
+    static void FlipScreen();
+    static void PresentFrame();
 
     static void DrawPixel(const int& x, const int& y, const uint32_t& color);
     static void DrawLine(const int& x0, const int& y0, const int& x1, const int& y1, const uint32_t& color, const bool& lockToScreen);

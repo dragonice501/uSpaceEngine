@@ -32,6 +32,9 @@ struct Vec2 {
     float Magnitude() const;                 // v1.Magnitude()
     float MagnitudeSquared() const;          // v1.MagnitudeSquared()
 
+    double Distance(const Vec2& v);
+    double DistanceSquared(const Vec2& v);
+
     Vec2& Normalize();                       // v1.Normalize()
     Vec2 UnitVector() const;                 // v1.UnitVector()
     Vec2 Normal() const;                     // n = v1.Normal()

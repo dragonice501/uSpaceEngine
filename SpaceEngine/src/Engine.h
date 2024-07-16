@@ -10,40 +10,25 @@
 
 class Engine
 {
-    private:
-        bool running = false;
-        float deltaTime = 0;
+private:
+    static bool isRunning;
+    static int timeAccelIndex;
+    static int timeAccelerationSpeeds[10];
 
-        int timeAccelIndex = 1;
-        int timeAccelerationSpeeds[6] = { 0, 1, 2, 3, 5, 10 };
+    float deltaTime = 0;
 
-        Ship* ship = nullptr;
-        Satellite* tulli = nullptr;
-        Satellite* yobo = nullptr;
+public:
+    Engine() = default;
+    ~Engine() = default;
 
-        std::vector<Satellite*> satellites;
-        std::vector<Satellite*> influencingSatellites;
+    static void SetIsRunning(bool running) { isRunning = running; }
+    static void IncrementTimeAccel() { timeAccelIndex++; if (timeAccelIndex > 9) timeAccelIndex = 9; }
+    static void DecrementTimeAccel() { timeAccelIndex--; if (timeAccelIndex < 0) timeAccelIndex = 0; }
+    static int GetTimeAccel() { return timeAccelerationSpeeds[timeAccelIndex]; }
 
-        bool mouseButtonDown = false;
-        Vec2 screenOffset = { 0.0f, 0.0f };
+    bool Init();
+    void Run();
+    void Shutdown();
 
-        bool showTutorial = true;
-
-    public:
-        Engine() = default;
-        ~Engine() = default;
-
-        void Setup();
-        void Destroy();
-
-        bool IsRunning();
-        
-        void Input();
-        void Update();
-        void Render();
-
-        void Reset();
-        
-        void RenderTutorialText();
-        void RenderUI();
+    bool IsRunning();
 };

@@ -1,5 +1,5 @@
 #include "Body.h"
-#include "../Graphics//GraphicsConstants.h"
+#include "GraphicsConstants.h"
 
 Body::Body(const Shape& shape, float x, float y, float mass)
 {

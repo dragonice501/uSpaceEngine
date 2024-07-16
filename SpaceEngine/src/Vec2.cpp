@@ -114,6 +114,16 @@ float Vec2::MagnitudeSquared() const {
 	return (x * x + y * y);
 }
 
+double Vec2::Distance(const Vec2& v)
+{
+	return sqrt(x *v.x + y * v.y);
+}
+
+double Vec2::DistanceSquared(const Vec2& v)
+{
+	return x * v.x + y * v.y;
+}
+
 Vec2& Vec2::Normalize() {
 	float length = Magnitude();
 	if (length != 0.0) {

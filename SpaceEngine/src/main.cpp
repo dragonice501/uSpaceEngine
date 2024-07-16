@@ -2,17 +2,13 @@
 
 int main(int argv, char* argc[])
 {
-    Engine app;
-    app.Setup();
+    Engine engine;
 
-    while (app.IsRunning())
+    if (engine.Init())
     {
-        app.Input();
-        app.Update();
-        app.Render();
+        engine.Run();
     }
-
-    app.Destroy();
+    engine.Shutdown();
 
     return 0;
 }

@@ -1,3 +1,3 @@
 #pragma once
 
-const float G = 1.0f;
+const double G = 6.67e-11;

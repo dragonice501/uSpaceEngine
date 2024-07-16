@@ -13,6 +13,7 @@ SDL_Texture* Graphics::colorBufferTexture = nullptr;
 SDL_Window* Graphics::window = nullptr;
 SDL_Renderer* Graphics::renderer = nullptr;
 
+float Graphics::yAspect = 0;
 Vec2 Graphics::screenOffset = { 0.0f, 0.0f };
 float Graphics::screenZoom = 1.0f;
 
@@ -28,6 +29,9 @@ bool Graphics::OpenWindow()
     SDL_GetCurrentDisplayMode(0, &display_mode);
     windowWidth = display_mode.w;
     windowHeight = display_mode.h;
+
+    yAspect = static_cast<float>(windowHeight) / static_cast<float>(windowWidth);
+
     screenWidth = windowWidth * SCREEN_SCALE;
     screenHeight = windowHeight * SCREEN_SCALE;
     window = SDL_CreateWindow(nullptr, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_BORDERLESS);
@@ -114,7 +118,31 @@ void Graphics::ClearScreen(const uint32_t& color)
     SDL_RenderClear(renderer);
 }
 
-void Graphics::RenderFrame()
+void Graphics::FlipScreen()
+{
+    uint32_t temp;
+    uint32_t size = screenWidth * screenHeight;
+    size_t ySize;
+    size_t yMirror;
+    size_t i;
+
+    for (size_t y = 0; y < screenHeight / 2; y++)
+    {
+        for (size_t x = 0; x < screenWidth; x++)
+        {
+            ySize = y * screenWidth;
+            yMirror = size - (screenWidth - x) - ySize;
+
+            i = x + ySize;
+
+            temp = colorBuffer[i];
+            colorBuffer[i] = colorBuffer[yMirror];
+            colorBuffer[yMirror] = temp;
+        }
+    }
+}
+
+void Graphics::PresentFrame()
 {
     SDL_UpdateTexture(colorBufferTexture, nullptr, colorBuffer, sizeof(uint32_t) * screenWidth);
     SDL_RenderCopy(renderer, colorBufferTexture, nullptr, nullptr);

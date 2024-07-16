@@ -132,7 +132,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\OrbitScene.cpp" />
     <ClCompile Include="src\Engine.cpp" />
+    <ClCompile Include="src\RandomSystemScene.cpp" />
+    <ClCompile Include="src\RocketScene.cpp" />
     <ClCompile Include="src\Satellite.cpp" />
     <ClCompile Include="src\Ship.cpp" />
     <ClCompile Include="src\Font.cpp" />
@@ -145,9 +148,16 @@
     <ClCompile Include="src\Shape.cpp" />
     <ClCompile Include="src\Vec2.cpp" />
     <ClCompile Include="src\Utils.cpp" />
+    <ClCompile Include="src\Vec2Double.cpp" />
+    <ClCompile Include="src\Vec3Double.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CelestialBody.h" />
+    <ClInclude Include="src\RandomSystemScene.h" />
+    <ClInclude Include="src\KeplerOrbit.h" />
+    <ClInclude Include="src\OrbitScene.h" />
+    <ClInclude Include="src\CelestialBody.h" />
+    <ClInclude Include="src\RocketScene.h" />
+    <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Satellite.h" />
     <ClInclude Include="src\Ship.h" />
@@ -162,6 +172,8 @@
     <ClInclude Include="src\Shape.h" />
     <ClInclude Include="src\Vec2.h" />
     <ClInclude Include="src\Utils.h" />
+    <ClInclude Include="src\Vec2Double.h" />
+    <ClInclude Include="src\Vec3Double.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
