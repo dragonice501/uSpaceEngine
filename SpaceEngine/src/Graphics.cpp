@@ -1,6 +1,11 @@
 #include "Graphics.h"
 #include "GraphicsConstants.h"
 #include "Font.h"
+
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_sdl2.h"
+#include "../imgui/imgui_impl_sdlrenderer2.h"
+
 #include <iostream>
 
 int Graphics::windowWidth = 0;
@@ -144,8 +149,13 @@ void Graphics::FlipScreen()
 
 void Graphics::PresentFrame()
 {
+    ImGui::Render();
+
     SDL_UpdateTexture(colorBufferTexture, nullptr, colorBuffer, sizeof(uint32_t) * screenWidth);
     SDL_RenderCopy(renderer, colorBufferTexture, nullptr, nullptr);
+
+    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
+
     SDL_RenderPresent(renderer);
 }
 

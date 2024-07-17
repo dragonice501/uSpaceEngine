@@ -3,7 +3,8 @@
 #include "PhysicsConstants.h"
 #include "Vec2Double.h"
 
-#include <iostream>
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_sdl2.h"
 
 void OrbitScene::Setup()
 {
@@ -80,7 +81,8 @@ void OrbitScene::Setup()
     pluto.mass = 1.309e22;
     pluto.radius = 1188307;
     pluto.semiMajorAxis = 5.9e12;
-    pluto.eccentricity = 0.25f;
+    pluto.eccentricity = 0.2488f;
+    pluto.argPeriapsis = 113.834f;
     pluto.size = 2;
     pluto.color = 0xf6ddbd;
 
@@ -92,7 +94,7 @@ void OrbitScene::Setup()
     planets.push_back(&saturn);
     planets.push_back(&uranus);
     planets.push_back(&neptune);
-    //planets.push_back(&pluto);
+    planets.push_back(&pluto);
 
     for (auto planet : planets)
     {
@@ -113,6 +115,9 @@ void OrbitScene::Input()
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
+        ImGui_ImplSDL2_ProcessEvent(&event);
+        ImGuiIO& io = ImGui::GetIO();
+
         switch (event.type)
         {
             case SDL_QUIT:
@@ -197,6 +202,8 @@ void OrbitScene::Render()
             Graphics::DrawFillCircle(Graphics::screenWidth * planetU, Graphics::screenHeight * planetV, planet->size, planet->color);
         }
     }
+    
+    ImGui::ShowDemoWindow();
 }
 
 void OrbitScene::CalculatePosition(CelestialBody& planet)

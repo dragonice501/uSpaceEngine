@@ -5,6 +5,10 @@
 #include "RandomSystemScene.h"
 #include "RocketScene.h"
 
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_sdl2.h"
+#include "../imgui/imgui_impl_sdlrenderer2.h"
+
 #include <SDL.h>
 
 bool Engine::isRunning = false;
@@ -19,6 +23,10 @@ bool Engine::IsRunning()
 bool Engine::Init()
 {
     if (!Graphics::OpenWindow()) return false;
+
+    ImGui::CreateContext();
+    ImGui_ImplSDL2_InitForSDLRenderer(Graphics::GetWindow(), Graphics::GetRenderer());
+    ImGui_ImplSDLRenderer2_Init(Graphics::GetRenderer());
 
     isRunning = true;
 
@@ -49,11 +57,15 @@ void Engine::Run()
         
         Graphics::ClearScreen(0xFF111122);
 
+        ImGui_ImplSDLRenderer2_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
+
         scene.Input();
         scene.Update(deltaTime);
         scene.Render();
 
-        Graphics::FlipScreen();
+        //Graphics::FlipScreen();
         Graphics::PresentFrame();
     }
 
@@ -62,5 +74,9 @@ void Engine::Run()
 
 void Engine::Shutdown()
 {
+    ImGui_ImplSDLRenderer2_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+
     Graphics::CloseWindow();
 }

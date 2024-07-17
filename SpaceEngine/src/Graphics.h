@@ -23,6 +23,9 @@ struct Graphics
     static Vec2 screenOffset;
     static float screenZoom;
 
+    static SDL_Window* GetWindow() { return window; }
+    static SDL_Renderer* GetRenderer() { return renderer; }
+
     static bool OpenWindow();
     static void CloseWindow();
 

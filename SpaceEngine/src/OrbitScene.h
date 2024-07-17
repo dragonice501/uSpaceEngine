@@ -21,7 +21,7 @@ private:
 
 	std::vector<CelestialBody*> planets;
 
-	double systemSize = 10e11;
+	double systemSize = 170e11;
 
 public:
 	OrbitScene() {}
