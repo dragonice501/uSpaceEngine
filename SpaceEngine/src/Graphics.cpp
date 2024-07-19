@@ -168,6 +168,11 @@ void Graphics::DrawPixel(const int& x, const int& y, const uint32_t& color)
 
 void Graphics::DrawLine(const int& x0, const int& y0, const int& x1, const int& y1, const uint32_t& color, const bool& lockToScreen)
 {
+    if ((x0 < 0 || x0 > screenWidth) &&
+        (y0 < 0 || y0 > screenHeight) &&
+        (x1 < 0 || x1 > screenWidth) &&
+        (y0 < 0 || y0 > screenHeight)) return;
+
     float x = x0;
     float y = y0;
     int deltaX = x1 - x0;
@@ -186,6 +191,8 @@ void Graphics::DrawLine(const int& x0, const int& y0, const int& x1, const int& 
             DrawPixel(static_cast<int>(x + screenOffset.x), static_cast<int>(y + screenOffset.y), color);
         x += xIncrement;
         y += yIncrement;
+
+        //if((x < 0 || x > screenWidth) && ( y < 0 || y > screenHeight)) break;
     }
 }
 

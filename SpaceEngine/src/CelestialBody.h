@@ -9,12 +9,14 @@ class CelestialBody
 public:
 	// Physical Properties
 	double mass;
+	int massExponent;
 	double radius;
 	Vec3Double position;
 	Vec3Double velocity;
 
 	// Kepler Orbit Elements
 	double semiMajorAxis;
+	int semiMajorExponent;
 	float eccentricity;
 	float inclination = 0.0f;
 	float ascLongitude = 0.0f;
@@ -24,12 +26,12 @@ public:
 	// Helper Elements
 	float meanAnomaly = 0.0f;
 	double n = 0.0;
-	float period = 0.0f;
-	float currentPeriod = 0.0f;
+	double period = 0.0f;
+	double currentPeriod = 0.0f;
 
 	// Render Properties
 	int size;
-	uint32_t color;
+	uint32_t color = 0xffffffff;
 	Vec3Double orbitPoints[32];
 
 public:
@@ -51,15 +53,10 @@ public:
 	void CalculateOrbitPoints(const double systemSize)
 	{
 		double min = systemSize / 2;
-
 		double a;
 		double r;
 
 		float x;
-
-		/*position.y =
-			r * sin(argPeriapsis + a) * sin(inclination);*/
-
 		float z;
 
 		for (size_t i = 0; i < 32; i += 1)

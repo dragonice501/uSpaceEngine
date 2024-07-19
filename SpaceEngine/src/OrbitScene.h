@@ -21,7 +21,10 @@ private:
 
 	std::vector<CelestialBody*> planets;
 
-	double systemSize = 170e11;
+	double systemSize = 20e11;
+	Vec3Double systemOffset;
+
+	bool mouseButtonDown = false;
 
 public:
 	OrbitScene() {}

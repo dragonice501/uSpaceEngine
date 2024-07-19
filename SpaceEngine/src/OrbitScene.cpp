@@ -1,16 +1,11 @@
 #include "OrbitScene.h"
 
-#include "PhysicsConstants.h"
 #include "Vec2Double.h"
-
-#include "../imgui/imgui.h"
-#include "../imgui/imgui_impl_sdl2.h"
 
 void OrbitScene::Setup()
 {
     sun.mass = 1.989e30;
     sun.radius = 696347055;
-    sun.position = Vec3Double(0, 0, 0);
     sun.size = 10;
     sun.color = 0xffffff00;
 
@@ -112,30 +107,71 @@ void OrbitScene::Destroy()
  
 void OrbitScene::Input()
 {
-    SDL_Event event;
-    while (SDL_PollEvent(&event))
+    SDL_Event sdlEvent;
+    while (SDL_PollEvent(&sdlEvent))
     {
-        ImGui_ImplSDL2_ProcessEvent(&event);
+        ImGui_ImplSDL2_ProcessEvent(&sdlEvent);
         ImGuiIO& io = ImGui::GetIO();
 
-        switch (event.type)
+        switch (sdlEvent.type)
         {
             case SDL_QUIT:
             {
                 Engine::SetIsRunning(false);
                 break;
             }
+            case SDL_MOUSEMOTION:
+            {
+                if (mouseButtonDown)
+                {
+                    systemOffset.x += sdlEvent.motion.xrel * systemSize * 0.0005f;
+                    systemOffset.z -= sdlEvent.motion.yrel * systemSize * 0.0005f;
+                }
+                break;
+            }
+            case SDL_MOUSEWHEEL:
+            {
+                systemSize -= sdlEvent.wheel.y * systemSize * 0.1f;
+                if (systemSize <= 0) systemSize = 2e11;
+                else if (systemSize >= 262e11) systemSize = 260e11;
+
+                break;
+            }
+            case SDL_MOUSEBUTTONDOWN:
+            {
+                switch (sdlEvent.button.button)
+                {
+                case SDL_BUTTON_LEFT:
+                {
+                    mouseButtonDown = true;
+                    break;
+                }
+                }
+                break;
+            }
+            case SDL_MOUSEBUTTONUP:
+            {
+                switch (sdlEvent.button.button)
+                {
+                case SDL_BUTTON_LEFT:
+                {
+                    mouseButtonDown = false;
+                    break;
+                }
+                }
+                break;
+            }
             case SDL_KEYDOWN:
             {
-                if (event.key.keysym.sym == SDLK_ESCAPE)
+                if (sdlEvent.key.keysym.sym == SDLK_ESCAPE)
                     Engine::SetIsRunning(false);
 
-                if (event.key.keysym.sym == SDLK_COMMA)
+                if (sdlEvent.key.keysym.sym == SDLK_COMMA)
                 {
                     Engine::DecrementTimeAccel();
                     break;
                 }
-                if (event.key.keysym.sym == SDLK_PERIOD)
+                if (sdlEvent.key.keysym.sym == SDLK_PERIOD)
                 {
                     Engine::IncrementTimeAccel();
                     break;
@@ -152,7 +188,7 @@ void OrbitScene::Update(float deltaTime)
     {
         if (planet)
         {
-            planet->currentPeriod += 86400 * deltaTime;
+            planet->currentPeriod += deltaTime * Engine::GetTimeAccel();
             if (planet->currentPeriod >= planet->period) planet->currentPeriod -= planet->period;
 
             // Find Mean Anomaly
@@ -184,9 +220,11 @@ void OrbitScene::Update(float deltaTime)
 void OrbitScene::Render()
 {
     double min = systemSize / 2;
+    double x = systemOffset.x;
+    double z = systemOffset.z;
 
-    float sunU = min / systemSize;
-    float sunV = sunU;
+    double sunU = (min + x) / systemSize;
+    double sunV = ((z / Graphics::yAspect) + min) / systemSize;
 
     Graphics::DrawFillCircle(Graphics::screenWidth * sunU, Graphics::screenHeight * sunV, sun.size, sun.color);
 
@@ -196,14 +234,14 @@ void OrbitScene::Render()
         {
             DrawOrbit(*planet);
 
-            float planetU = (planet->position.x + min) / systemSize;
-            float planetV = (planet->position.z / Graphics::yAspect + min) / systemSize;
+            double planetU = ((planet->position.x + x) + min) / systemSize;
+            double planetV = ((planet->position.z + z) / Graphics::yAspect + min) / systemSize;
 
             Graphics::DrawFillCircle(Graphics::screenWidth * planetU, Graphics::screenHeight * planetV, planet->size, planet->color);
         }
     }
-    
-    ImGui::ShowDemoWindow();
+
+    //ImGui::ShowDemoWindow();
 }
 
 void OrbitScene::CalculatePosition(CelestialBody& planet)
@@ -227,15 +265,18 @@ void OrbitScene::CalculatePosition(CelestialBody& planet)
 void OrbitScene::DrawOrbit(const CelestialBody& planet)
 {
     double min = systemSize / 2;
+    double xO = systemOffset.x;
+    double zO = systemOffset.z;
+
     for (size_t i = 0; i < 32; i++)
     {
         size_t j = i + 1 >= 32 ? 0 : i + 1;
 
-        float u = (planet.orbitPoints[i].x + min) / systemSize;
-        float v = (planet.orbitPoints[i].z / Graphics::yAspect + min) / systemSize;
+        float u = (planet.orbitPoints[i].x + xO + min) / systemSize;
+        float v = (((planet.orbitPoints[i].z + zO) / Graphics::yAspect) + min) / systemSize;
 
-        float w = (planet.orbitPoints[j].x + min) / systemSize;
-        float x = (planet.orbitPoints[j].z / Graphics::yAspect + min) / systemSize;
+        float w = (planet.orbitPoints[j].x + xO + min) / systemSize;
+        float x = (((planet.orbitPoints[j].z + zO) / Graphics::yAspect) + min) / systemSize;
 
         Graphics::DrawLine(Graphics::screenWidth * u, Graphics::screenHeight * v, Graphics::screenWidth * w, Graphics::screenHeight * x, planet.color, false);
     }

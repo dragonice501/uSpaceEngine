@@ -13,7 +13,7 @@ class Engine
 private:
     static bool isRunning;
     static int timeAccelIndex;
-    static int timeAccelerationSpeeds[10];
+    static int timeAccelerationSpeeds[11];
 
     float deltaTime = 0;
 
@@ -22,7 +22,7 @@ public:
     ~Engine() = default;
 
     static void SetIsRunning(bool running) { isRunning = running; }
-    static void IncrementTimeAccel() { timeAccelIndex++; if (timeAccelIndex > 9) timeAccelIndex = 9; }
+    static void IncrementTimeAccel() { timeAccelIndex++; if (timeAccelIndex > 10) timeAccelIndex = 10; }
     static void DecrementTimeAccel() { timeAccelIndex--; if (timeAccelIndex < 0) timeAccelIndex = 0; }
     static int GetTimeAccel() { return timeAccelerationSpeeds[timeAccelIndex]; }
 

@@ -4,6 +4,7 @@
 #include "OrbitScene.h"
 #include "RandomSystemScene.h"
 #include "RocketScene.h"
+#include "SystemCreatorScene.h"
 
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_sdl2.h"
@@ -13,7 +14,7 @@
 
 bool Engine::isRunning = false;
 int Engine::timeAccelIndex = 1;
-int Engine::timeAccelerationSpeeds[10] = { 0, 1, 2, 3, 4, 5, 10, 100, 1000, 10000 };
+int Engine::timeAccelerationSpeeds[11] = { 0, 1, 2, 3, 4, 5, 10, 100, 1000, 10000, 1000000 };
 
 bool Engine::IsRunning()
 {
@@ -35,9 +36,10 @@ bool Engine::Init()
 
 void Engine::Run()
 {
-    OrbitScene scene;
+    //OrbitScene scene;
     //RocketScene scene;
-    
+    SystemCreatorScene scene;
+
     scene.Setup();
 
     while (isRunning)
@@ -51,7 +53,6 @@ void Engine::Run()
 
         deltaTime = (SDL_GetTicks() - timePreviousFrame) / 1000.0f;
         if (deltaTime > 0.016f) deltaTime = 0.016f;
-        deltaTime *= timeAccelerationSpeeds[timeAccelIndex];
 
         timePreviousFrame = SDL_GetTicks();
         
@@ -65,7 +66,7 @@ void Engine::Run()
         scene.Update(deltaTime);
         scene.Render();
 
-        //Graphics::FlipScreen();
+        Graphics::FlipScreen();
         Graphics::PresentFrame();
     }
 
