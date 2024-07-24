@@ -230,5 +230,11 @@
     <ClInclude Include="src\SystemCreatorScene.h">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="src\Rocket.h">
+      <Filter>Header Files\GameObjects</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="RocketScene.txt" />
   </ItemGroup>
 </Project>

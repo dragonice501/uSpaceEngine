@@ -49,7 +49,7 @@ void Satellite::Render()
 		Graphics::DrawFillCircle(body->position.x, body->position.y, circle->radius, color);
 	}
 
-	Graphics::DrawCircle(body->position.x, body->position.y, sphereOfInfluence, 0.0f, color, false);
+	Graphics::DrawCircle(body->position.x, body->position.y, sphereOfInfluence, 0.0f, color);
 
 	Graphics::DrawString(
 		body->position.x - Font::GetStringFontLength(name) * 0.5f,

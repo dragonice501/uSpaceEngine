@@ -1,5 +1,4 @@
 #include "Graphics.h"
-#include "GraphicsConstants.h"
 #include "Font.h"
 
 #include "../imgui/imgui.h"
@@ -20,7 +19,10 @@ SDL_Renderer* Graphics::renderer = nullptr;
 
 float Graphics::yAspect = 0;
 Vec2 Graphics::screenOffset = { 0.0f, 0.0f };
+Vec2 Graphics::mousePos = { 0.0f, 0.0f };
 float Graphics::screenZoom = 1.0f;
+int Graphics::screenScales[SCREEN_SCALES] = { 10, 50, 100, 500, 1000, 5000, 10000, 20000  };
+size_t Graphics::scalesIndex = 2;
 
 bool Graphics::OpenWindow()
 {
@@ -87,29 +89,45 @@ int Graphics::ScreenHeight()
     return screenHeight;
 }
 
-void Graphics::AdjustScreenOffset(const Vec2& offset)
+int Graphics::GetScreenScale()
 {
-    screenOffset.x += offset.x;
-    screenOffset.y += offset.y;
+    for (size_t j = SCREEN_SCALES- 1; j >= 0; j--)
+    {
+        if (PIXELS_PER_UNIT * screenZoom >= screenScales[j])
+        {
+            scalesIndex = j;
+            break;
+        }
+    }
+
+    int scale = PIXELS_PER_UNIT / ((PIXELS_PER_UNIT * screenZoom) / screenScales[scalesIndex]);
+
+    return scale;
 }
 
-void Graphics::ResetScreenOffset()
+void Graphics::AddScreenOffset(const int x, const int y)
 {
-    screenOffset = { 0.0f, 0.0f };
+    screenOffset.x += x;
+    screenOffset.y += y;
 }
 
-void Graphics::ScrollZoom(const int& scroll)
+void Graphics::IncrementZoom(const int scroll)
 {
-    screenZoom += static_cast<float>(scroll) * 0.25f;
+    screenZoom -= screenZoom * scroll * 0.05f;
+
+    if (PIXELS_PER_UNIT * screenZoom <= 10)
+    {
+        screenZoom = 0.1f;
+    }
 }
 
 bool Graphics::CircleOffScreen(const int& x, const int& y, const float& radius)
 {
     return
-        x + radius + screenOffset.x < 0 ||
-        x - radius + screenOffset.x > screenWidth ||
-        y + radius + screenOffset.y < 0 ||
-        y - radius + screenOffset.y > screenHeight;
+        (x + radius - screenOffset.x) * screenZoom < 0 ||
+        (x - radius - screenOffset.x) * screenZoom > screenWidth ||
+        (y + radius - screenOffset.y) * screenZoom < 0 ||
+        (y - radius - screenOffset.y) * screenZoom > screenHeight;
 
 }
 
@@ -166,7 +184,7 @@ void Graphics::DrawPixel(const int& x, const int& y, const uint32_t& color)
     colorBuffer[x + y * screenWidth] = color;
 }
 
-void Graphics::DrawLine(const int& x0, const int& y0, const int& x1, const int& y1, const uint32_t& color, const bool& lockToScreen)
+void Graphics::DrawLine(const int x0, const int y0, const int x1, const int y1, const uint32_t color)
 {
     if ((x0 < 0 || x0 > screenWidth) &&
         (y0 < 0 || y0 > screenHeight) &&
@@ -185,10 +203,7 @@ void Graphics::DrawLine(const int& x0, const int& y0, const int& x1, const int& 
 
     for (int i = 0; i < steps; i++)
     {
-        if(lockToScreen)
-            DrawPixel(static_cast<int>(x), static_cast<int>(y), color);
-        else
-            DrawPixel(static_cast<int>(x + screenOffset.x), static_cast<int>(y + screenOffset.y), color);
+        DrawPixel(static_cast<int>(x + screenOffset.x), static_cast<int>(y + screenOffset.y), color);
         x += xIncrement;
         y += yIncrement;
 
@@ -196,14 +211,63 @@ void Graphics::DrawLine(const int& x0, const int& y0, const int& x1, const int& 
     }
 }
 
-void Graphics::DrawGrid(const uint32_t& color)
+void Graphics::DrawULine(float u)
+{
+    int x = u * screenWidth;
+    for (size_t i = 0; i < Graphics::screenHeight; i++)
+    {
+        colorBuffer[x + i * screenWidth] = 0xFF333333;
+    }
+}
+
+void Graphics::DrawXYAxis(float u, float v)
+{
+    // Draw X Axis
+    if (!(v < 0.0f || v > 1.0f))
+    {
+        int y = v * (screenHeight - 1);
+        for (size_t i = 0; i < Graphics::screenWidth; i++)
+        {
+            colorBuffer[i + y * screenWidth] = 0xFFFF0000;
+        }
+    }
+
+    // Draw Y Axis
+    if (!(u < 0.0f || u > 1.0f))
+    {
+        int x = u * (screenWidth - 1);
+        for (size_t i = 0; i < Graphics::screenHeight; i++)
+        {
+            colorBuffer[x + i * screenWidth] = 0xFF00FF00;
+        }
+    }
+}
+
+void Graphics::DrawGrid(const uint32_t color)
 {
     for (int y = 0; y < screenHeight; y++)
     {
         for (int x = 0; x < screenWidth; x++)
         {
-            if (x % PIXELS_PER_METER == 0 || y % PIXELS_PER_METER == 0)
+            if (x % PIXELS_PER_UNIT == 0 || y % PIXELS_PER_UNIT == 0)
                 DrawPixel(x, y, color);
+        }
+    }
+}
+
+void Graphics::DrawGrid(int xOffset, int yOffset, int size)
+{
+    int mod = size;
+
+    int xOff = xOffset % size;
+    int yOff = yOffset % size;
+
+    for (int y = 0; y < screenHeight; y++)
+    {
+        for (int x = 0; x < screenWidth; x++)
+        {
+            if ((x - xOff) % mod == 0 || (y - yOff) % mod == 0)
+                DrawPixel(x, y, 0xFF333333);
         }
     }
 }
@@ -236,7 +300,7 @@ void Graphics::DrawFillRect(const int& x, const int& y, const int& width, const 
     }
 }
 
-void Graphics::DrawCircle(const int& x, const int& y, const int& radius, const float& angle, const uint32_t& color, const bool& lockToScreen)
+void Graphics::DrawCircle(const int x, const int y, const int radius, const float angle, const uint32_t color)
 {
     if (CircleOffScreen(x, y, radius)) return;
 
@@ -244,7 +308,7 @@ void Graphics::DrawCircle(const int& x, const int& y, const int& radius, const f
     int y0 = radius;
     int p0 = 3 - (2 * radius);
 
-    DisplayBresenhamCircle(x, y, x0, y0, color, lockToScreen);
+    DisplayBresenhamCircle(x, y, x0, y0, color, false);
 
     while (y0 >= x0)
     {
@@ -260,27 +324,81 @@ void Graphics::DrawCircle(const int& x, const int& y, const int& radius, const f
             p0 += 4 * x0 + 6;
         }
 
-        DisplayBresenhamCircle(x, y, x0, y0, color, lockToScreen);
+        DisplayBresenhamCircle(x, y, x0, y0, color, false);
     }
 
     //DrawLine(x, y, x + cos(angle) * radius, y + sin(angle) * radius, color, lockToScreen);
 }
 
-void Graphics::DrawFillCircle(const int& x, const int& y, const int& radius, const uint32_t& color)
+void Graphics::DrawFillCircle(const long x, const long y, const long radius, const uint32_t color)
 {
-    if (CircleOffScreen(x, y, radius)) return;
-    int pRadius = radius;
-    int topLeftX = x - pRadius;
-    int topLeftY = y - pRadius;
+    long u = x / screenZoom + screenOffset.x;
+    long v = y / screenZoom + screenOffset.y;
+    long r = radius / screenZoom;
 
-    for (int i = topLeftY; i < topLeftY + pRadius * 2 + 1; i++)
+    if (CircleOffScreen(u, v, r)) return;
+
+    long radiusSqr = r * r;
+    long xD = 0;
+    long yD = 0;
+
+    // Top Left Quarter
+    for (long cY = 0; cY < r; cY++)
     {
-        for (int j = topLeftX; j < topLeftX + pRadius * 2 + 1; j++)
-        {
-            Vec2 point = { static_cast<float>(x - j), static_cast<float>(y - i) };
+        if (v + cY >= screenHeight || v + cY < 0) continue;
 
-            if (point.MagnitudeSquared() < pRadius * pRadius)
-                DrawPixel(j + screenOffset.x, i + screenOffset.y, color);
+        xD = 0;
+        while (xD * xD + cY * cY < radiusSqr)
+        {
+            xD++;
+            if (u - xD < 0 || u - xD >= screenWidth) continue;
+
+            colorBuffer[(u - xD) + (v + cY) * screenWidth] = color;
+        }
+    }
+
+    // Bottom Left Quarter
+    for (long cY = 0; cY < r; cY++)
+    {
+        if (v - cY >= screenHeight || v - cY < 0) continue;
+
+        xD = 0;
+        while (xD * xD + cY * cY < radiusSqr)
+        {
+            xD++;
+            if (u - xD < 0 || u - xD >= screenWidth) continue;
+
+            colorBuffer[(u - xD) + (v - cY) * screenWidth] = color;
+        }
+    }
+
+    // Top Right Quarter
+    for (long cY = 0; cY < r; cY++)
+    {
+        if (v + cY >= screenHeight || v + cY < 0) continue;
+
+        xD = -1;
+        while (xD * xD + cY * cY < radiusSqr)
+        {
+            xD++;
+            if (u + xD < 0 || u + xD >= screenWidth) continue;
+
+            colorBuffer[(u + xD) + (v + cY) * screenWidth] = color;
+        }
+    }
+
+    // Bottom Right Quarter
+    for (long cY = 0; cY < r; cY++)
+    {
+        if (v - cY >= screenHeight || v - cY < 0) continue;
+
+        xD = -1;
+        while (xD * xD + cY * cY < radiusSqr)
+        {
+            xD++;
+            if (u + xD < 0 || u + xD >= screenWidth) continue;
+
+            colorBuffer[(u + xD) + (v - cY) * screenWidth] = color;
         }
     }
 }
@@ -290,13 +408,13 @@ void Graphics::DrawPolygon(const int& x, const int& y, const std::vector<Vec2>& 
     Vec2 current = vertices[0];
     Vec2 previous = vertices[vertices.size() - 1];
 
-    DrawLine(previous.x, previous.y, current.x, current.y, 0xFFFFFFFF, lockToScreen);
+    DrawLine(previous.x, previous.y, current.x, current.y, 0xFFFFFFFF);
 
     for (int i = 1; i < vertices.size(); i++)
     {
         previous = current;
         current = vertices[i];
-        DrawLine(previous.x, previous.y, current.x, current.y, color, lockToScreen);
+        DrawLine(previous.x, previous.y, current.x, current.y, color);
     }
 }
 

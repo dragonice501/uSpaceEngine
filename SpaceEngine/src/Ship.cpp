@@ -73,14 +73,14 @@ void Ship::Render()
             body->position.y,
             body->position.x + velocityVector.x * circle->radius * 3.0f,
             body->position.y + velocityVector.y * circle->radius * 3.0f,
-            0xFFFFFF00, false);
+            0xFFFFFF00);
 
         Graphics::DrawLine(
             body->position.x,
             body->position.y,
             body->position.x + GetThrustVector().x * circle->radius * 3.0f,
             body->position.y + GetThrustVector().y * circle->radius * 3.0f,
-            0xFFFF0000, false);
+            0xFFFF0000);
     }
 
     if (influencingSatellite)

@@ -16,6 +16,7 @@ private:
 
 	Vec3Double systemOffset;
 
+	double systemSizeDefault = 20e11;
 	double systemSize = 20e11;
 
 	float sunMass = 1.989f;
@@ -27,7 +28,7 @@ private:
 	float semiMajor = 5.793684f;
 	int semiMajorExponent = 10;
 	float eccentricity = 0.205f;
-	float argPeriapsis = 29.124f;
+	float argPeriapsis = 0.0f;
 	float trueAnomaly = 0.0f;
 	float color[4];
 	uint32_t trueColor = 0xffffffff;

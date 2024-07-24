@@ -132,8 +132,24 @@ void OrbitScene::Input()
             case SDL_MOUSEWHEEL:
             {
                 systemSize -= sdlEvent.wheel.y * systemSize * 0.1f;
-                if (systemSize <= 0) systemSize = 2e11;
-                else if (systemSize >= 262e11) systemSize = 260e11;
+                if (systemSize <= 2e11)
+                {
+                    systemSize = 2e11;
+                    return;
+                }
+                else if (systemSize >= 262e11)
+                {
+                    systemSize = 260e11;
+                    return;
+                }
+
+                float r = io.DisplaySize.x / 2;
+                float t = io.DisplaySize.y / 2;
+                float mouseX = (r - io.MousePos.x) / r;
+                float mouseZ = ((t - io.MousePos.y) / t) * Graphics::yAspect;
+
+                systemOffset.x += (systemSize / 25) * mouseX * sdlEvent.wheel.y;
+                systemOffset.z -= ((systemSize) / 25) * mouseZ * sdlEvent.wheel.y;
 
                 break;
             }
@@ -220,13 +236,11 @@ void OrbitScene::Update(float deltaTime)
 void OrbitScene::Render()
 {
     double min = systemSize / 2;
-    double x = systemOffset.x;
-    double z = systemOffset.z;
 
-    double sunU = (min + x) / systemSize;
-    double sunV = ((z / Graphics::yAspect) + min) / systemSize;
+    double sunU = (min + systemOffset.x) / systemSize;
+    double sunV = ((systemOffset.z / Graphics::yAspect) + min) / systemSize;
 
-    Graphics::DrawFillCircle(Graphics::screenWidth * sunU, Graphics::screenHeight * sunV, sun.size, sun.color);
+    Graphics::DrawFillCircle(Graphics::screenWidth * sunU, Graphics::screenHeight * sunV, 10.0f, sun.color);
 
     for (auto planet : planets)
     {
@@ -234,10 +248,10 @@ void OrbitScene::Render()
         {
             DrawOrbit(*planet);
 
-            double planetU = ((planet->position.x + x) + min) / systemSize;
-            double planetV = ((planet->position.z + z) / Graphics::yAspect + min) / systemSize;
+            double planetU = ((planet->position.x + systemOffset.x) + min) / systemSize;
+            double planetV = ((planet->position.z + systemOffset.z) / Graphics::yAspect + min) / systemSize;
 
-            Graphics::DrawFillCircle(Graphics::screenWidth * planetU, Graphics::screenHeight * planetV, planet->size, planet->color);
+            Graphics::DrawFillCircle(Graphics::screenWidth * planetU, Graphics::screenHeight * planetV, 10.0f, planet->color);
         }
     }
 
@@ -278,6 +292,6 @@ void OrbitScene::DrawOrbit(const CelestialBody& planet)
         float w = (planet.orbitPoints[j].x + xO + min) / systemSize;
         float x = (((planet.orbitPoints[j].z + zO) / Graphics::yAspect) + min) / systemSize;
 
-        Graphics::DrawLine(Graphics::screenWidth * u, Graphics::screenHeight * v, Graphics::screenWidth * w, Graphics::screenHeight * x, planet.color, false);
+        Graphics::DrawLine(Graphics::screenWidth * u, Graphics::screenHeight * v, Graphics::screenWidth * w, Graphics::screenHeight * x, planet.color);
     }
 }

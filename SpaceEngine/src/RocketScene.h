@@ -2,33 +2,20 @@
 
 #include "Scene.h"
 
-#include "Graphics.h"
-#include "Body.h"
-
-#include "Ship.h"
-#include "Satellite.h"
+#include "CelestialBody.h"
+#include "Rocket.h"
 
 #include <vector>
 
 class RocketScene : public Scene
 {
 private:
-    float deltaTime = 0;
-
-    int timeAccelIndex = 1;
-    int timeAccelerationSpeeds[6] = { 0, 1, 2, 3, 5, 10 };
-
-    Ship* ship = nullptr;
-    Satellite* tulli = nullptr;
-    Satellite* yobo = nullptr;
-
-    std::vector<Satellite*> satellites;
-    std::vector<Satellite*> influencingSatellites;
-
     bool mouseButtonDown = false;
-    Vec2 screenOffset = { 0.0f, 0.0f };
 
-    bool showTutorial = true;
+    CelestialBody planet;
+    Rocket rocket;
+
+    std::vector<Vec3Double> points;
 
 public:
     RocketScene() = default;
@@ -41,8 +28,8 @@ public:
     void Update(float deltaTime) override;
     void Render() override;
 
-    void Reset();
-
-    void RenderTutorialText();
-    void RenderUI();
+    void GeneratePoints(float start, float end, int count);
+    Vec3Double GeneratePoint(float p);
+    void Tessellate(Vec3Double a, Vec3Double b, int t);
+    float ComputeTriangleArea(const Vec3Double& a, const Vec3Double& b, const Vec3Double& c);
 };

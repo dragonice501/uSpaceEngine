@@ -35,8 +35,8 @@ void SystemCreatorScene::Input()
         {
             if (mouseButtonDown)
             {
-                systemOffset.x -= sdlEvent.motion.xrel;
-                systemOffset.z += sdlEvent.motion.yrel;
+                systemOffset.x += sdlEvent.motion.xrel * systemSize * 0.0005f;
+                systemOffset.z -= sdlEvent.motion.yrel * systemSize * 0.0005f;
             }
             break;
         }
@@ -44,8 +44,24 @@ void SystemCreatorScene::Input()
         {
             systemSize -= sdlEvent.wheel.y * systemSize * 0.1f;
 
-            if (systemSize <= 5e10) systemSize = 5e10;
-            else if (systemSize >= 262e11) systemSize = 260e11;
+            if (systemSize <= 5e9)
+            {
+                systemSize = 5e9;
+                return;
+            }
+            else if (systemSize >= 262e11)
+            {
+                systemSize = 260e11;
+                return;
+            }
+
+            float r = io.DisplaySize.x / 2;
+            float t = io.DisplaySize.y / 2;
+            float mouseX = (r - io.MousePos.x) / r;
+            float mouseZ = ((t - io.MousePos.y) / t) * Graphics::yAspect;
+
+            systemOffset.x += (systemSize / 25) * mouseX * sdlEvent.wheel.y;
+            systemOffset.z -= ((systemSize) / 25) * mouseZ * sdlEvent.wheel.y;
 
             break;
         }
@@ -59,12 +75,9 @@ void SystemCreatorScene::Input()
                 {
                     if (io.MousePos.x < 500) return;
 
-                    double x = systemOffset.x * systemSize * 0.0005f;
-                    double z = systemOffset.z * systemSize * 0.0005f;
-
                     Vec3Double systemSelectionPoint;
-                    systemSelectionPoint.x = (io.MousePos.x / io.DisplaySize.x) * systemSize - systemSize / 2 + x;
-                    systemSelectionPoint.z = -((io.MousePos.y / io.DisplaySize.y) * systemSize - systemSize / 2) * Graphics::yAspect + z;
+                    systemSelectionPoint.x = (io.MousePos.x / io.DisplaySize.x) * systemSize - systemSize / 2 + systemOffset.x * (systemSize / systemSizeDefault);
+                    systemSelectionPoint.z = -((io.MousePos.y / io.DisplaySize.y) * systemSize - systemSize / 2) * Graphics::yAspect + systemOffset.z;
 
                     std::cout << systemSelectionPoint.x << ", " << systemSelectionPoint.z << std::endl;
 
@@ -170,24 +183,23 @@ void SystemCreatorScene::Update(float deltaTime)
 void SystemCreatorScene::Render()
 {
     double min = systemSize / 2;
-    double x = -systemOffset.x * systemSize * 0.0005f;
-    double z = -systemOffset.z * systemSize * 0.0005f;
 
-    double sunU = (min + x) / systemSize;
-    double sunV = ((z / Graphics::yAspect) + min) / systemSize;
+
+    double sunU = (min + systemOffset.x) / systemSize;
+    double sunV = ((systemOffset.z / Graphics::yAspect) + min) / systemSize;
 
     int radius = (sun.radius / SunRadius) * 50;
 
     Graphics::DrawFillCircle(Graphics::screenWidth * sunU, Graphics::screenHeight * sunV, sun.size, sun.color);
     if (&sun == selectedPlanet)
     {
-        Graphics::DrawCircle(Graphics::screenWidth * sunU, Graphics::screenHeight * sunV, 15, 0.0f, 0xFFFFAA00, false);
+        Graphics::DrawCircle(Graphics::screenWidth * sunU, Graphics::screenHeight * sunV, 15, 0.0f, 0xFFFFAA00);
     }
 
     for (size_t i = 0; i < planets.size(); i++)
     {
-        double planetU = ((planets[i].position.x + x) + min) / systemSize;
-        double planetV = ((planets[i].position.z + z) / Graphics::yAspect + min) / systemSize;
+        double planetU = ((planets[i].position.x + systemOffset.x) + min) / systemSize;
+        double planetV = ((planets[i].position.z + systemOffset.z) / Graphics::yAspect + min) / systemSize;
 
         radius = (planets[i].radius / SunRadius) * 50;
 
@@ -197,7 +209,7 @@ void SystemCreatorScene::Render()
 
         if (&planets[i] == selectedPlanet)
         {
-            Graphics::DrawCircle(Graphics::screenWidth * planetU, Graphics::screenHeight * planetV, 15, 0.0f, 0xFFFFAA00, false);
+            Graphics::DrawCircle(Graphics::screenWidth * planetU, Graphics::screenHeight * planetV, 15, 0.0f, 0xFFFFAA00);
         }
     }
 }
@@ -208,11 +220,14 @@ void SystemCreatorScene::DrawGUI()
 
     static bool p;
     ImGui::Begin("System Creator", &p, ImGuiWindowFlags_NoMove);
+    ImGui::Text(("System Size: " + std::to_string(systemSize)).c_str());
+    ImGui::Text(("X Offset: " + std::to_string(systemOffset.x)).c_str());
+    ImGui::Text(("Y Offset: " + std::to_string(systemOffset.y)).c_str());
 
     // Sun Settings
     ImGui::SeparatorText("Sun");
 
-    if (ImGui::InputFloat("Mass kg 10e30", &sunMass, 0.1f, 1.0f, "%.3f")) SetSunSettings(sunMass);
+    if (ImGui::InputFloat("Mass kg 10e30", &sunMass, 0.01f, 1.0f, "%.3f")) SetSunSettings(sunMass);
 
     if (ImGui::Button("Create Sun"))
     {
@@ -258,6 +273,7 @@ void SystemCreatorScene::DrawGUI()
     {
         if (selectedPlanet)
         {
+            selectedPlanet->semiMajorExponent = semiMajorExponent;
             selectedPlanet->semiMajorAxis = semiMajor * pow(10, semiMajorExponent);
 
             double u = G * (sun.mass + selectedPlanet->mass);
@@ -400,6 +416,25 @@ void SystemCreatorScene::DrawGUI()
 
         selectedPlanet = &planets.back();
     }
+    if (ImGui::Button("Remove Planet"))
+    {
+        if (selectedPlanet)
+        {
+            for (size_t i = 0; i < planets.size(); i++)
+            {
+                if (&planets[i] == selectedPlanet)
+                {
+                    CelestialBody temp = planets.back();
+                    planets.back() = *selectedPlanet;
+                    planets[i] = temp;
+
+                    planets.pop_back();
+
+                    selectedPlanet = nullptr;
+                }
+            }
+        }
+    }
 
     // Selected Planet Properties
     ImGui::SeparatorText("Selected Planet");
@@ -411,7 +446,6 @@ void SystemCreatorScene::DrawGUI()
 
     // Simulation
     ImGui::SeparatorText("Simulation");
-
     ImGui::Checkbox("Simulate Orbit", &simulateOrbit);
 
     ImGui::End();
@@ -557,12 +591,12 @@ void SystemCreatorScene::DrawOrbit(const CelestialBody& planet)
     {
         size_t j = i + 1 >= 32 ? 0 : i + 1;
 
-        float u = (planet.orbitPoints[i].x + xO + min) / systemSize;
-        float v = (((planet.orbitPoints[i].z + zO) / Graphics::yAspect) + min) / systemSize;
+        float u = (planet.orbitPoints[i].x + systemOffset.x + min) / systemSize;
+        float v = (((planet.orbitPoints[i].z + systemOffset.z) / Graphics::yAspect) + min) / systemSize;
 
-        float w = (planet.orbitPoints[j].x + xO + min) / systemSize;
-        float x = (((planet.orbitPoints[j].z + zO) / Graphics::yAspect) + min) / systemSize;
+        float w = (planet.orbitPoints[j].x + systemOffset.x + min) / systemSize;
+        float x = (((planet.orbitPoints[j].z + systemOffset.z) / Graphics::yAspect) + min) / systemSize;
 
-        Graphics::DrawLine(Graphics::screenWidth * u, Graphics::screenHeight * v, Graphics::screenWidth * w, Graphics::screenHeight * x, planet.color, false);
+        Graphics::DrawLine(Graphics::screenWidth * u, Graphics::screenHeight * v, Graphics::screenWidth * w, Graphics::screenHeight * x, planet.color);
     }
 }

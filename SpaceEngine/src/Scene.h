@@ -7,6 +7,7 @@
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_sdl2.h"
 
+#include <iostream>
 #include <SDL.h>
 
 class Scene

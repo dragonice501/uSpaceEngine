@@ -37,8 +37,8 @@ bool Engine::Init()
 void Engine::Run()
 {
     //OrbitScene scene;
-    //RocketScene scene;
-    SystemCreatorScene scene;
+    RocketScene scene;
+    //SystemCreatorScene scene;
 
     scene.Setup();
 
