@@ -55,9 +55,12 @@ struct Graphics
     static size_t GetScreenScaleIndex() { return screenScales[scalesIndex]; }
 
     static void AddScreenOffset(const int x, const int y);
+    static void SetScreenOffset(const double x, const double y) { screenOffset = Vec2Double(x, y); }
     static void IncrementZoom(const int scroll);
+    static void SetZoom(const float zoom) { screenZoom = zoom; }
 
-    static bool CircleOffScreen(const double x, const double y, const double radius);
+    static bool CircleOffScreen(const int x, const int y, const int radius);
+    static bool PlanetOffScreen(const double x, const double y, const double radius);
 
     static void ClearScreen(const uint32_t& color);
     static void FlipScreen();

@@ -29,6 +29,7 @@ struct Vec3Double
 
 	double Magnitude() const;
 	double MagnitudeSquared() const;
+	Vec3Double Normal();
 
 	double Dot(const Vec3Double& v) const;
 	Vec3Double Cross(const Vec3Double& v) const;

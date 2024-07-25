@@ -153,9 +153,11 @@
     <ClCompile Include="imgui\imgui_impl_sdlrenderer2.cpp" />
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\CelestialBody.cpp" />
     <ClCompile Include="src\OrbitScene.cpp" />
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\RandomSystemScene.cpp" />
+    <ClCompile Include="src\Rocket.cpp" />
     <ClCompile Include="src\RocketScene.cpp" />
     <ClCompile Include="src\Satellite.cpp" />
     <ClCompile Include="src\Ship.cpp" />

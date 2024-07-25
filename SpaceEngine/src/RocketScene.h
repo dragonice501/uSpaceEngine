@@ -12,8 +12,6 @@ class RocketScene : public Scene
 private:
     bool mouseButtonDown = false;
 
-    float dT;
-
     CelestialBody planet;
     Rocket rocket;
 
@@ -29,6 +27,8 @@ public:
     void Input() override;
     void Update(float deltaTime) override;
     void Render() override;
+
+    bool CheckCollision();
 
     void GeneratePoints(float start, float end, int count);
     Vec3Double GeneratePoint(float p);

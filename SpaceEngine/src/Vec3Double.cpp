@@ -92,6 +92,12 @@ double Vec3Double::MagnitudeSquared() const
     return x * x + y * y + z * z;
 }
 
+Vec3Double Vec3Double::Normal()
+{
+    double mag = this->Magnitude();
+    return *this / mag;
+}
+
 double Vec3Double::Dot(const Vec3Double& v) const
 {
     return x * v.x + y * v.y + z * v.z;
