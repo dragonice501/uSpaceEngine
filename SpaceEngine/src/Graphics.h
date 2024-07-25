@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Vec2.h"
+#include "Vec2Double.h"
 #include "GraphicsConstants.h"
 
 #include <SDL.h>
@@ -21,9 +22,9 @@ struct Graphics
     static SDL_Renderer* renderer;
 
     static float yAspect;
-    static Vec2 screenOffset;
+    static Vec2Double screenOffset;
     static Vec2 mousePos;
-    static float screenZoom;
+    static double screenZoom;
     static int screenScales[SCREEN_SCALES];
     static size_t scalesIndex;
 
@@ -48,7 +49,7 @@ struct Graphics
         (mousePos.y - screenOffset.y) * screenZoom);
     }
     static const Vec2 GetMouseScreen() { return mousePos; }
-    static const Vec2& GetScreenOffset() { return screenOffset; }
+    static const Vec2Double& GetScreenOffset() { return screenOffset; }
     static float GetZoom() { return screenZoom; }
     static int GetScreenScale();
     static size_t GetScreenScaleIndex() { return screenScales[scalesIndex]; }
@@ -56,7 +57,7 @@ struct Graphics
     static void AddScreenOffset(const int x, const int y);
     static void IncrementZoom(const int scroll);
 
-    static bool CircleOffScreen(const int& x, const int& y, const float& radius);
+    static bool CircleOffScreen(const double x, const double y, const double radius);
 
     static void ClearScreen(const uint32_t& color);
     static void FlipScreen();
@@ -73,7 +74,9 @@ struct Graphics
     static void DrawRect(const int& x, const int& y, const int& width, const int& height, const uint32_t& color);
     static void DrawFillRect(const int& x, const int& y, const int& width, const int& height, const uint32_t& color);
     static void DrawCircle(const int x, const int y, const int radius, const float angle, const uint32_t color);
-    static void DrawFillCircle(const long x, const long y, const long radius, const uint32_t color);
+    static void DrawFillCircle(const double x, const double y, const double radius, const uint32_t color);
+    static void DrawPlanet(const double x, const double y, const double radius, const uint32_t color);
+
     static void DrawPolygon(const int& x, const int& y, const std::vector<Vec2>& vertices, const uint32_t& color, const bool& lockToScreen);
     static void DrawFillPolygon(const int& x, const int& y, const std::vector<Vec2>& vertices, const uint32_t& color, const bool& lockToScreen);
     static void DrawTexture(const int& x, const int& y, const int& width, const int& height, const float& rotation, SDL_Texture* texture);

@@ -12,6 +12,8 @@ class RocketScene : public Scene
 private:
     bool mouseButtonDown = false;
 
+    float dT;
+
     CelestialBody planet;
     Rocket rocket;
 

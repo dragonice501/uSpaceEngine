@@ -9,7 +9,9 @@ void RocketScene::Setup()
 	planet.radius = 6e6;
 
 	rocket.mass = 9.908e6;
-	rocket.position.y = planet.radius + 1;
+	rocket.position.y = planet.radius + 10;
+
+    Graphics::IncrementZoom(100000);
 }
 
 void RocketScene::Destroy()
@@ -102,20 +104,23 @@ void RocketScene::Input()
 
 void RocketScene::Update(float deltaTime)
 {
+    dT = deltaTime;
 }
 
 void RocketScene::Render()
 {
-    Vec2 offset = Graphics::GetScreenOffset();
+    Vec2Double offset = Graphics::GetScreenOffset();
     double u = offset.x / Graphics::screenWidth;
     double v = offset.y / Graphics::screenHeight;
 
-    Graphics::DrawFillCircle(231, 231, 50, 0xFFFF0000);
+    Graphics::DrawPlanet(0, 0, planet.radius, 0xFFFFff55);
     Graphics::DrawGrid(offset.x, offset.y, Graphics::GetScreenScale());
+    Graphics::DrawPlanet(rocket.position.x, rocket.position.y, 10, 0xFFFF0000);
     Graphics::DrawXYAxis(u, v);
 
     static bool p;
     ImGui::Begin("Rocket Scene", &p, ImGuiWindowFlags_NoMove);
+    ImGui::Text(("DeltaTime: " + std::to_string(dT)).c_str());
 
     ImGui::Text(("System Size: " + std::to_string(100)).c_str());
     ImGui::Text(("World X: " + std::to_string(Graphics::GetMouseWorld().x)).c_str());

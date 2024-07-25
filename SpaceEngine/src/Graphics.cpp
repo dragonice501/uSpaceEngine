@@ -18,10 +18,10 @@ SDL_Window* Graphics::window = nullptr;
 SDL_Renderer* Graphics::renderer = nullptr;
 
 float Graphics::yAspect = 0;
-Vec2 Graphics::screenOffset = { 0.0f, 0.0f };
+Vec2Double Graphics::screenOffset = { 0.0f, 0.0f };
 Vec2 Graphics::mousePos = { 0.0f, 0.0f };
-float Graphics::screenZoom = 1.0f;
-int Graphics::screenScales[SCREEN_SCALES] = { 10, 50, 100, 500, 1000, 5000, 10000, 20000  };
+double Graphics::screenZoom = 1.0f;
+int Graphics::screenScales[SCREEN_SCALES] = { 10, 50, 100, 500, 1000, 5000, 10000, 20000, 50000, 100000  };
 size_t Graphics::scalesIndex = 2;
 
 bool Graphics::OpenWindow()
@@ -121,13 +121,13 @@ void Graphics::IncrementZoom(const int scroll)
     }
 }
 
-bool Graphics::CircleOffScreen(const int& x, const int& y, const float& radius)
+bool Graphics::CircleOffScreen(const double x, const double y, const double radius)
 {
     return
-        (x + radius - screenOffset.x) * screenZoom < 0 ||
-        (x - radius - screenOffset.x) * screenZoom > screenWidth ||
-        (y + radius - screenOffset.y) * screenZoom < 0 ||
-        (y - radius - screenOffset.y) * screenZoom > screenHeight;
+        (x + radius) * screenZoom < 0 ||
+        (x - radius) * screenZoom > screenWidth ||
+        (y + radius) * screenZoom < 0 ||
+        (y - radius) * screenZoom > screenHeight;
 
 }
 
@@ -330,76 +330,119 @@ void Graphics::DrawCircle(const int x, const int y, const int radius, const floa
     //DrawLine(x, y, x + cos(angle) * radius, y + sin(angle) * radius, color, lockToScreen);
 }
 
-void Graphics::DrawFillCircle(const long x, const long y, const long radius, const uint32_t color)
+void Graphics::DrawFillCircle(const double x, const double y, const double radius, const uint32_t color)
 {
-    long u = x / screenZoom + screenOffset.x;
-    long v = y / screenZoom + screenOffset.y;
-    long r = radius / screenZoom;
+    
+}
+
+void Graphics::DrawPlanet(const double x, const double y, const double radius, const uint32_t color)
+{
+    double u = x / screenZoom + screenOffset.x;
+    double v = y / screenZoom + screenOffset.y;
+    double r = radius / screenZoom;
 
     if (CircleOffScreen(u, v, r)) return;
 
-    long radiusSqr = r * r;
-    long xD = 0;
-    long yD = 0;
+    double rSqr = r * r;
+
+    double xD = 0;
+    double yD = 0;
 
     // Top Left Quarter
-    for (long cY = 0; cY < r; cY++)
+    int xStart;
+    int yStart = v <= 0 ? 0 : v >= screenHeight ? screenHeight : v;
+    yD = abs(v - yStart);
+
+    while (yStart < screenHeight)
     {
-        if (v + cY >= screenHeight || v + cY < 0) continue;
+        xStart = u <= 0 ? 0 : u >= screenWidth ? screenWidth - 1 : u;
+        if (xStart == 0) break;
 
-        xD = 0;
-        while (xD * xD + cY * cY < radiusSqr)
+        xD = abs(u - xStart);
+
+        while (xD * xD + yD * yD < rSqr)
         {
-            xD++;
-            if (u - xD < 0 || u - xD >= screenWidth) continue;
+            colorBuffer[xStart + yStart * screenWidth] = color;
 
-            colorBuffer[(u - xD) + (v + cY) * screenWidth] = color;
+            xStart--;
+            xD++;
+            if (xStart < 0) break;
         }
+
+        yStart++;
+        yD++;
     }
 
     // Bottom Left Quarter
-    for (long cY = 0; cY < r; cY++)
+    yStart = v <= 0 ? 0 : v >= screenHeight ? screenHeight - 1 : v;
+    yD = abs(v - yStart);
+
+    while (yStart > 0)
     {
-        if (v - cY >= screenHeight || v - cY < 0) continue;
+        xStart = u <= 0 ? 0 : u >= screenWidth ? screenWidth - 1 : u;
+        if (xStart == 0) break;
 
-        xD = 0;
-        while (xD * xD + cY * cY < radiusSqr)
+        xD = abs(u - xStart);
+
+        while (xD * xD + yD * yD < rSqr)
         {
-            xD++;
-            if (u - xD < 0 || u - xD >= screenWidth) continue;
+            colorBuffer[xStart + yStart * screenWidth] = color;
 
-            colorBuffer[(u - xD) + (v - cY) * screenWidth] = color;
+            xStart--;
+            xD++;
+            if (xStart < 0) break;
         }
+
+        yStart--;
+        yD++;
     }
 
     // Top Right Quarter
-    for (long cY = 0; cY < r; cY++)
+    yStart = v <= 0 ? 0 : v >= screenHeight ? screenHeight : v;
+    yD = abs(v - yStart);
+
+    while (yStart < screenHeight)
     {
-        if (v + cY >= screenHeight || v + cY < 0) continue;
+        xStart = u <= 0 ? 0 : u >= screenWidth ? screenWidth : u;
+        if (xStart == screenWidth) break;
 
-        xD = -1;
-        while (xD * xD + cY * cY < radiusSqr)
+        xD = abs(u - xStart);
+
+        while (xD * xD + yD * yD < rSqr)
         {
-            xD++;
-            if (u + xD < 0 || u + xD >= screenWidth) continue;
+            colorBuffer[xStart + yStart * screenWidth] = color;
 
-            colorBuffer[(u + xD) + (v + cY) * screenWidth] = color;
+            xStart++;
+            xD++;
+            if (xStart >= screenWidth) break;
         }
+
+        yStart++;
+        yD++;
     }
 
     // Bottom Right Quarter
-    for (long cY = 0; cY < r; cY++)
+    yStart = v <= 0 ? 0 : v >= screenHeight ? screenHeight - 1 : v;
+    yD = abs(v - yStart);
+
+    while (yStart > 0)
     {
-        if (v - cY >= screenHeight || v - cY < 0) continue;
+        xStart = u <= 0 ? 0 : u >= screenWidth ? screenWidth : u;
+        if (xStart == screenWidth) break;
 
-        xD = -1;
-        while (xD * xD + cY * cY < radiusSqr)
+        xD = abs(u - xStart);
+
+        while (xD * xD + yD * yD < rSqr)
         {
-            xD++;
-            if (u + xD < 0 || u + xD >= screenWidth) continue;
+            colorBuffer[xStart + yStart * screenWidth] = color;
 
-            colorBuffer[(u + xD) + (v - cY) * screenWidth] = color;
+            xStart++;
+            xD++;
+            if (xStart >= screenWidth) break;
         }
+
+        yStart--;
+        yD++;
     }
 }
 
